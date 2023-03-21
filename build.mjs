@@ -2,6 +2,7 @@ import archiver from 'archiver'
 import autoprefixer from 'autoprefixer'
 import * as dotenv from 'dotenv'
 import esbuild from 'esbuild'
+import svgr from 'esbuild-plugin-svgr'
 import postcssPlugin from 'esbuild-style-plugin'
 import fs from 'fs-extra'
 import process from 'node:process'
@@ -26,7 +27,7 @@ async function runEsbuild() {
     bundle: true,
     outdir: outdir,
     treeShaking: true,
-    minify: true,
+    minify: false,
     legalComments: 'none',
     define: {
       'process.env.NODE_ENV': '"production"',
@@ -39,6 +40,11 @@ async function runEsbuild() {
       '.png': 'dataurl',
     },
     plugins: [
+      svgr({
+        replaceAttrValues: {
+          '#000000': 'currentColor',
+        },
+      }),
       postcssPlugin({
         postcss: {
           plugins: [tailwindcss, autoprefixer],

@@ -29,6 +29,8 @@
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",
     "@types/lodash-es": "^4.17.6",
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.11",
     "@types/uuid": "^9.0.0",
     "@types/webextension-polyfill": "^0.9.2",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
@@ -38,6 +40,7 @@
     "chokidar-cli": "^3.0.0",
     "dotenv": "^16.0.3",
     "esbuild": "^0.17.4",
+    "esbuild-plugin-svgr": "^1.0.1",
     "esbuild-style-plugin": "^1.6.1",
     "eslint": "^8.30.0",
     "eslint-config-prettier": "^8.5.0",

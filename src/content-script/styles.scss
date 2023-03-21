@@ -96,3 +96,30 @@
     }
   }
 }
+
+.aikit-container {
+  .selection-kit {
+    white-space: nowrap;
+    font-size: 1.5em;
+    padding: 0 7px;
+    line-height: 40px;
+    border: 1px solid rgba(0,0,0,0.1);
+    height: 40px;
+    width: 120px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 1px 40px 10px rgba(0,0,0,0.1);
+
+    a[role="button"] {
+      padding: 6px;
+      color: #333333;
+      cursor: pointer;
+      line-height: 20px;
+      display: inline-block;
+
+      &:hover {
+        color: #09d3ac;
+      }
+    }
+  }
+}
