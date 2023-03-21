@@ -65,3 +65,7 @@ Browser.runtime.onInstalled.addListener((details) => {
     Browser.runtime.openOptionsPage()
   }
 })
+
+Browser.commands.onCommand.addListener((command) => {
+  console.log(`Command: ${command}`)
+})

@@ -5,6 +5,12 @@
 [![Twitter Follow](https://img.shields.io/twitter/follow/chatgpt4google?style=social)](https://twitter.com/chatgpt4google)
 ![License](https://img.shields.io/github/license/wong2/chatgpt-google-extension)
 
+### TODOs
+ - popup
+ - 鼠标右键：翻译、summary
+ - CMD+K 唤起智能框，类似Spotlight
+ - Chat
+
 ### Notice (2023-02-20)
 
 As this extension has been acquired, this code repository will no longer be updated from now on.
