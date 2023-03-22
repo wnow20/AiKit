@@ -1,5 +1,6 @@
 import React from 'react'
 import Draggable from 'react-draggable'
+import Browser from 'webextension-polyfill'
 import AvatarIcon from './avatar.svg'
 import './DialogBox.scss'
 import OpenAIIcon from './openai.svg'
@@ -10,8 +11,11 @@ interface DialogBoxProps {
 }
 
 interface Message {
+  id?: string
   role: string
   data: string
+  status?: 'not_started' | 'error' | 'progressing' | 'succeed'
+  error?: string
 }
 
 interface DialogItemProps {
@@ -35,50 +39,83 @@ function DialogItem(props: DialogItemProps) {
   )
 }
 
-function generateDataSource(): Message[] {
-  return [
-    {
-      role: 'user',
-      data: '翻译',
-    },
-    {
-      role: 'assistant',
-      data: '翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译',
-    },
-    {
-      role: 'user',
-      data: '翻译',
-    },
-    {
-      role: 'assistant',
-      data: '翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译',
-    },
-    {
-      role: 'user',
-      data: '翻译',
-    },
-    {
-      role: 'assistant',
-      data: '翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译',
-    },
-    {
-      role: 'user',
-      data: '翻译',
-    },
-    {
-      role: 'assistant',
-      data: '翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译翻译',
-    },
-  ]
+function updateByMsgId(
+  prev: Message[],
+  msg: any,
+  updator: (prevItem: Message) => Message,
+): Message[] {
+  const index = prev.findIndex((x) => msg.messageId === x.id)
+  if (index === -1) {
+    return [
+      ...prev,
+      updator({
+        id: msg.messageId,
+        data: msg.text,
+        role: 'assistant',
+      }),
+    ]
+  }
+  const prevItem = prev[index]
+  return [...prev.slice(0, index), updator(prevItem), ...prev.slice(index + 1)]
 }
 
 function DialogBox(props: DialogBoxProps) {
-  const messages = generateDataSource()
-  const [prompt, setPrompt] = React.useState('')
+  const { prompt } = props
+  const [text, setText] = React.useState('')
   const [inputHeight, setInputHeight] = React.useState(24)
+  const [messages, setMessages] = React.useState<Message[]>([])
+
+  React.useEffect(() => {
+    if (!prompt) {
+      return
+    }
+    setMessages([
+      {
+        role: 'user',
+        data: prompt,
+        status: 'not_started',
+      },
+    ])
+    const port = Browser.runtime.connect()
+    const listener = (msg: any) => {
+      console.log('received answer', msg)
+      if (msg.text) {
+        setMessages((prev) => {
+          return updateByMsgId(prev, msg, (prevItem) => ({
+            ...prevItem,
+            data: msg.text,
+            status: 'progressing',
+          }))
+        })
+      } else if (msg.error) {
+        setMessages((prev) => {
+          return updateByMsgId(prev, msg, (prevItem) => ({
+            ...prevItem,
+            data: msg.text,
+            status: 'error',
+            error: msg.error,
+          }))
+        })
+      } else if (msg.event === 'DONE') {
+        setMessages((prev) => {
+          return updateByMsgId(prev, msg, (prevItem) => ({
+            ...prevItem,
+            status: 'succeed',
+          }))
+        })
+      }
+    }
+    port.onMessage.addListener(listener)
+    console.log('postMessage', prompt)
+    port.postMessage({ question: prompt })
+    return () => {
+      port.onMessage.removeListener(listener)
+      port.disconnect()
+    }
+  }, [prompt])
 
   const handleInputChange = React.useCallback((e) => {
-    setPrompt(() => {
+    setText(() => {
       return e.target.value
     })
     // if (e.target.value) {
@@ -113,7 +150,7 @@ function DialogBox(props: DialogBoxProps) {
           <textarea
             placeholder="CMD+回车发送"
             className="message-input"
-            value={prompt}
+            value={text}
             onKeyDownCapture={handleKeyDown}
             onChange={handleInputChange}
             style={{ maxHeight: '120px', height: `${inputHeight}px` }}

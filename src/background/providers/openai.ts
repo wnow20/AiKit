@@ -1,6 +1,10 @@
 import { fetchSSE } from '../fetch-sse'
 import { GenerateAnswerParams, Provider } from '../types'
 
+// const API_HOST = 'https://api.openai.com'
+const API_HOST =
+  'http://nginx.web-framework-p8cg.1109595215468882.cn-hongkong.fc.devsapp.net/openai'
+
 export class OpenAIProvider implements Provider {
   constructor(private token: string, private model: string) {
     this.token = token
@@ -16,7 +20,7 @@ export class OpenAIProvider implements Provider {
 
   async generateAnswer(params: GenerateAnswerParams) {
     let result = ''
-    await fetchSSE('https://api.openai.com/v1/completions', {
+    await fetchSSE(API_HOST + '/v1/completions', {
       method: 'POST',
       signal: params.signal,
       headers: {

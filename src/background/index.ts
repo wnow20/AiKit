@@ -24,6 +24,7 @@ async function generateAnswers(port: Browser.Runtime.Port, question: string) {
 }
 
 Browser.runtime.onConnect.addListener((port) => {
+  console.debug('connected')
   port.onMessage.addListener(async (msg) => {
     console.debug('received msg', msg)
     try {
