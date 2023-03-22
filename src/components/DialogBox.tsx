@@ -1,4 +1,5 @@
 import React from 'react'
+import Draggable from 'react-draggable'
 import AvatarIcon from './avatar.svg'
 import './DialogBox.scss'
 import OpenAIIcon from './openai.svg'
@@ -100,26 +101,29 @@ function DialogBox(props: DialogBoxProps) {
   }, [])
 
   return (
-    <div className="aikit-dialog-box" style={{ width: 400, height: 450 }}>
-      <div className="dialog-list">
-        {messages.map((message, index) => (
-          <DialogItem key={index} message={message} />
-        ))}
+    <Draggable handle=".dialog-header">
+      <div className="aikit-dialog-box" style={{ width: 400, height: 450 }}>
+        <div className="dialog-header"></div>
+        <div className="dialog-list">
+          {messages.map((message, index) => (
+            <DialogItem key={index} message={message} />
+          ))}
+        </div>
+        <div className="message-input-wrapper">
+          <textarea
+            placeholder="CMD+回车发送"
+            className="message-input"
+            value={prompt}
+            onKeyDownCapture={handleKeyDown}
+            onChange={handleInputChange}
+            style={{ maxHeight: '120px', height: `${inputHeight}px` }}
+          ></textarea>
+          <a role="button" className="send">
+            <SendIcon />
+          </a>
+        </div>
       </div>
-      <div className="message-input-wrapper">
-        <textarea
-          placeholder="CMD+回车发送"
-          className="message-input"
-          value={prompt}
-          onKeyDownCapture={handleKeyDown}
-          onChange={handleInputChange}
-          style={{ maxHeight: '120px', height: `${inputHeight}px` }}
-        ></textarea>
-        <a role="button" className="send">
-          <SendIcon />
-        </a>
-      </div>
-    </div>
+    </Draggable>
   )
 }
 
