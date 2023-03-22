@@ -10,6 +10,8 @@
  - 鼠标右键：翻译、summary
  - CMD+K 唤起智能框，类似Spotlight
  - Chat
+ - 多语言
+ - Ask ChatGPT for this query 这里可能需要动态的，目前应该是
 
 ### Notice (2023-02-20)
 

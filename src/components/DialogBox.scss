@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.aikit-dialog-box {
+  background: #ffffff;
+  color: #333333;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  box-shadow: 0 1px 40px 10px rgba(0, 0, 0, 0.1);
+  overflow-y: scroll;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+
+
+  .dialog-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0;
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }
+
+  .dialog-item {
+    display: flex;
+    gap: 1.6em;
+    padding: 1em 1.6em;
+
+    &.assistant {
+      background: #f2f2f2;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+      .avatar {
+        background: rgb(16, 163, 127);
+        color: #ffffff;
+      }
+    }
+
+    .avatar {
+      background: lightgray;
+      border-radius: 2px;
+      height: 30px;
+      width: 30px;
+      font-size: 16px;
+      text-align: center;
+      box-shadow: none;
+      padding: 7px;
+      color: #666666;
+    }
+  }
+
+  .message-input-wrapper {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: .5em 10px;
+    position: relative;
+    bottom: 0;
+    flex: 0 1;
+
+    textarea.message-input {
+      width: 100%;
+      border: none;
+      resize: none;
+      padding: 0;
+      line-height: 24px;
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    a.send {
+      cursor: pointer;
+      position: absolute;
+      color: rgba(142, 142, 160, 1);
+      right: 10px;
+      top: 15px;
+
+      &:hover {
+        color: rgb(16, 163, 127);
+      }
+    }
+  }
+}

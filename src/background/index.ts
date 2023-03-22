@@ -1,23 +1,9 @@
 import Browser from 'webextension-polyfill'
-import { getProviderConfigs, ProviderType } from '../config'
-import { ChatGPTProvider, getChatGPTAccessToken, sendMessageFeedback } from './providers/chatgpt'
-import { OpenAIProvider } from './providers/openai'
-import { Provider } from './types'
+import apiProvider from '../apiProvider'
+import { getChatGPTAccessToken, sendMessageFeedback } from './providers/chatgpt'
 
 async function generateAnswers(port: Browser.Runtime.Port, question: string) {
-  const providerConfigs = await getProviderConfigs()
-
-  let provider: Provider
-  if (providerConfigs.provider === ProviderType.ChatGPT) {
-    const token = await getChatGPTAccessToken()
-    provider = new ChatGPTProvider(token)
-  } else if (providerConfigs.provider === ProviderType.GPT3) {
-    const { apiKey, model } = providerConfigs.configs[ProviderType.GPT3]!
-    provider = new OpenAIProvider(apiKey, model)
-  } else {
-    throw new Error(`Unknown provider ${providerConfigs.provider}`)
-  }
-
+  const provider = await apiProvider()
   const controller = new AbortController()
   port.onDisconnect.addListener(() => {
     controller.abort()

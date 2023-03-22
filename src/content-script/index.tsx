@@ -1,6 +1,6 @@
 import { render } from 'preact'
 import '../base.css'
-import SelectionKit from '../components/SelectionKit'
+import FloatingKit from '../components/FloatingKit'
 import { getUserConfig, Language, Theme } from '../config'
 import { detectSystemColorScheme } from '../utils'
 import ChatGPTContainer from './ChatGPTContainer'
@@ -89,7 +89,7 @@ function initializeSelectionKit() {
       document.documentElement.appendChild(element)
       aikitContentContainer = element
 
-      render(<SelectionKit content={selectedContent} />, aikitContentContainer)
+      render(<FloatingKit selection={selectedContent} />, aikitContentContainer)
     })
   })
   document.addEventListener('mousedown', (e) => {

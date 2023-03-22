@@ -98,6 +98,8 @@
 }
 
 .aikit-container {
+  font-size: 14px;
+
   .selection-kit {
     white-space: nowrap;
     font-size: 1.5em;
@@ -118,7 +120,7 @@
       display: inline-block;
 
       &:hover {
-        color: #09d3ac;
+        color: rgb(16, 163, 127);
       }
     }
   }
