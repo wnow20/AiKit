@@ -13,7 +13,8 @@
 - 翻译、概述只读模式
 - popup
 - 对话框支持代码高亮、复制
-- 鼠标右键：翻译、summary
+- 上下文chat
+- 鼠标右键：翻译、summary、支持配置
 - 多语言
     - Ask ChatGPT for this query 这里可能需要动态的，目前应该是
 - [ ] 非中国区支持ChatGPT
