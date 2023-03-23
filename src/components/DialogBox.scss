@@ -88,4 +88,31 @@
       }
     }
   }
+
+  .dialog-list-tail {
+    text-align: center;
+    padding: 5px 10px;
+  }
+  .regenerate-btn {
+    align-items: center;
+    border-color: transparent;
+    border-radius: 0.25rem;
+    border-width: 1px;
+    display: inline-flex;
+    font-size: 1em;
+    line-height: 1rem;
+    padding: 0.25rem 0.5rem;
+    pointer-events: auto;
+    background-color: rgba(16, 163, 127, 1);
+    color: rgba(255, 255, 255, 1);
+
+    .btn-icon {
+      font-size: 1em;
+      padding: 3px;
+      svg {
+        width: 0.75em;
+        height: 0.75em;
+      }
+    }
+  }
 }

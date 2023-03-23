@@ -1,7 +1,7 @@
 import React from 'react'
 import Draggable from 'react-draggable'
 import { v4 as uuidv4 } from 'uuid'
-import Browser from 'webextension-polyfill'
+import Browser, { Runtime } from 'webextension-polyfill'
 import { AiEvent } from '../background/types'
 import AvatarIcon from './avatar.svg'
 import { updateByAiEvent } from './converse'
@@ -9,6 +9,7 @@ import CursorBlock from './CursorBlock'
 import './DialogBox.scss'
 import OpenAIIcon from './openai.svg'
 import QuestionTag from './QuestionTag'
+import RefreshIcon from './refresh.svg'
 import SendIcon from './send.svg'
 
 interface DialogBoxProps {
@@ -98,10 +99,25 @@ function updateByMsgId(
   return [...prev.slice(0, index), updator(prevItem), ...prev.slice(index + 1)]
 }
 
+function newQnA(text: string): QnA {
+  return {
+    question: {
+      id: uuidv4(),
+      text,
+      type: 'chat',
+    },
+    answer: {
+      id: uuidv4(),
+      text: '',
+      status: 'progressing',
+    },
+  }
+}
+
 function DialogBox(props: DialogBoxProps) {
   const { question } = props
   const [conversation, setConversation] = React.useState<Conversation>()
-
+  const portRef = React.useRef<Runtime.Port>()
   const [text, setText] = React.useState('')
   const [inputHeight, setInputHeight] = React.useState(24)
 
@@ -128,6 +144,7 @@ function DialogBox(props: DialogBoxProps) {
       return
     }
     const port = Browser.runtime.connect()
+    portRef.current = port
     const listener = (msg: AiEvent) => {
       console.log('received answer', msg)
       setConversation((prev) => {
@@ -147,30 +164,60 @@ function DialogBox(props: DialogBoxProps) {
     setText(() => {
       return e.target.value
     })
-    // if (e.target.value) {
-    //   setInputHeight(24 * e.target.value.split('\n').length);
-    // }
   }, [])
 
-  const handleKeyDown = React.useCallback((e) => {
-    console.log(e.which)
-    if (e.which === 13 && e.shiftKey == true) {
-      setInputHeight(e.target.value.split('\n').length * 24 + 24)
+  const handleKeyDown = React.useCallback(
+    (e) => {
+      console.log(e.which)
+      if (e.which === 13 && e.shiftKey == true) {
+        setInputHeight(e.target.value.split('\n').length * 24 + 24)
+      }
+      if (e.which === 8) {
+        e.target.value.endsWith('\n') && setInputHeight((prev) => prev - 24)
+      }
+      if (e.keyCode == 13 && e.shiftKey == false) {
+        e.preventDefault()
+        submit(e.target.value, conversation!)
+      }
+    },
+    [conversation],
+  )
+
+  function submit(inputText: string, conversation: Conversation) {
+    if (!conversation || conversation.qnaList.length === 0) {
+      return
     }
-    if (e.which === 8) {
-      e.target.value.endsWith('\n') && setInputHeight((prev) => prev - 24)
+    const progressing = conversation.qnaList.find((x) => {
+      return x.answer.status === 'progressing'
+    })
+    if (progressing) {
+      return
     }
-    if (e.keyCode == 13 && e.shiftKey == false) {
+
+    const qnA = newQnA(inputText)
+    setConversation((prevState): Conversation => {
+      return {
+        id: prevState?.id ?? uuidv4(),
+        qnaList: [...(prevState?.qnaList ?? []), qnA],
+      }
+    })
+    setTimeout(() => {
+      portRef.current?.postMessage({
+        question: qnA.question,
+      })
+    })
+    setText('')
+  }
+
+  const handleSendClick = React.useCallback(
+    (e) => {
       e.preventDefault()
-      // submit()
-    }
-  }, [])
-
-  const handleSendClick = React.useCallback((e) => {
-    e.preventDefault()
-
-    // submit();
-  }, [])
+      if (conversation && text) {
+        submit(text, conversation)
+      }
+    },
+    [conversation, text],
+  )
 
   const messages = React.useMemo(() => {
     const msgList: Message[] = []
@@ -187,14 +234,15 @@ function DialogBox(props: DialogBoxProps) {
         role: 'assistant',
         data: qna.answer.text,
         id: qna.answer.id,
+        error: qna.answer.error,
       })
     })
     return msgList
   }, [conversation])
 
-  console.log('messages')
-  console.log(messages)
-  console.log(conversation)
+  const handleRegenerateClick = React.useCallback(() => {
+    // TODO
+  }, [])
 
   return (
     <Draggable handle=".dialog-header">
@@ -204,6 +252,16 @@ function DialogBox(props: DialogBoxProps) {
           {messages.map((message, index) => (
             <DialogItem key={index} message={message} />
           ))}
+          {messages.length && messages[messages.length - 1].error ? (
+            <div className="dialog-list-tail">
+              <button className="regenerate-btn" onClick={handleRegenerateClick}>
+                <span className="btn-icon">
+                  <RefreshIcon />
+                </span>{' '}
+                重新生成
+              </button>
+            </div>
+          ) : null}
         </div>
         <div className="message-input-wrapper">
           <textarea
