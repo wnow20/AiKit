@@ -3,6 +3,8 @@ import Draggable from 'react-draggable'
 import { v4 as uuidv4 } from 'uuid'
 import Browser, { Runtime } from 'webextension-polyfill'
 import { AiEvent } from '../background/types'
+import { isApproachBottom, scrollToBottom } from '../domUtils'
+import useUpdateEffect from '../useUpdateEffect'
 import AvatarIcon from './avatar.svg'
 import { updateByAiEvent } from './converse'
 import CursorBlock from './CursorBlock'
@@ -118,6 +120,7 @@ function DialogBox(props: DialogBoxProps) {
   const { question } = props
   const [conversation, setConversation] = React.useState<Conversation>()
   const portRef = React.useRef<Runtime.Port>()
+  const scrollRef = React.useRef<HTMLDivElement>(null)
   const [text, setText] = React.useState('')
   const [inputHeight, setInputHeight] = React.useState(24)
 
@@ -168,7 +171,6 @@ function DialogBox(props: DialogBoxProps) {
 
   const handleKeyDown = React.useCallback(
     (e) => {
-      console.log(e.which)
       if (e.which === 13 && e.shiftKey == true) {
         setInputHeight(e.target.value.split('\n').length * 24 + 24)
       }
@@ -202,6 +204,9 @@ function DialogBox(props: DialogBoxProps) {
       }
     })
     setTimeout(() => {
+      scrollRef.current && scrollToBottom(scrollRef.current)
+    }, 100)
+    setTimeout(() => {
       portRef.current?.postMessage({
         question: qnA.question,
       })
@@ -218,6 +223,16 @@ function DialogBox(props: DialogBoxProps) {
     },
     [conversation, text],
   )
+  useUpdateEffect(() => {
+    if (!conversation) {
+      return
+    }
+    requestAnimationFrame(() => {
+      scrollRef.current &&
+        isApproachBottom(scrollRef.current, 50) &&
+        scrollToBottom(scrollRef.current)
+    })
+  }, [conversation])
 
   const messages = React.useMemo(() => {
     const msgList: Message[] = []
@@ -248,7 +263,7 @@ function DialogBox(props: DialogBoxProps) {
     <Draggable handle=".dialog-header">
       <div className="aikit-dialog-box" style={{ width: 400, height: 450 }}>
         <div className="dialog-header"></div>
-        <div className="dialog-list">
+        <div className="dialog-list" ref={scrollRef}>
           {messages.map((message, index) => (
             <DialogItem key={index} message={message} />
           ))}

@@ -9,6 +9,8 @@
  - popup
  - 鼠标右键：翻译、summary
  - CMD+K 唤起智能框，类似Spotlight
+ - 对话框，有新增消息是自动滚动到最后 
+ - 对话框支持代码高亮、复制
  - Chat
  - 多语言
  - Ask ChatGPT for this query 这里可能需要动态的，目前应该是
