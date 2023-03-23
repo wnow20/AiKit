@@ -6,14 +6,17 @@
 ![License](https://img.shields.io/github/license/wong2/chatgpt-google-extension)
 
 ### TODOs
- - popup
- - 鼠标右键：翻译、summary
- - CMD+K 唤起智能框，类似Spotlight
- - 对话框，有新增消息是自动滚动到最后 
- - 对话框支持代码高亮、复制
- - Chat
- - 多语言
- - Ask ChatGPT for this query 这里可能需要动态的，目前应该是
+- [x] CMD+K 唤起智能框，类似Spotlight
+- [x] 对话框，有新增消息是自动滚动到最后
+- [x] Chat
+- re-generate
+- 翻译、概述只读模式
+- popup
+- 对话框支持代码高亮、复制
+- 鼠标右键：翻译、summary
+- 多语言
+    - Ask ChatGPT for this query 这里可能需要动态的，目前应该是
+- [ ] 非中国区支持ChatGPT
 
 ### Notice (2023-02-20)
 
