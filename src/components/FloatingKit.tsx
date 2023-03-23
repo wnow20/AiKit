@@ -1,5 +1,5 @@
 import React from 'react'
-import DialogBox from './DialogBox'
+import DialogBox, { Question } from './DialogBox'
 import SelectionKit from './SelectionKit'
 
 interface FloatingKitProps {
@@ -9,15 +9,15 @@ interface FloatingKitProps {
 function FloatingKit(props: FloatingKitProps) {
   const { selection } = props
   const [triggered, setTriggered] = React.useState(false)
-  const [prompt, setPrompt] = React.useState()
+  const [question, setQuestion] = React.useState<Question>()
 
   const handleCompletionRequest = React.useCallback((nextPrompt) => {
-    setPrompt(nextPrompt)
+    setQuestion(nextPrompt)
     setTriggered(true)
   }, [])
 
   if (triggered) {
-    return <DialogBox prompt={prompt} />
+    return <DialogBox question={question} />
   }
 
   return <SelectionKit content={selection} onCompletionRequest={handleCompletionRequest} />

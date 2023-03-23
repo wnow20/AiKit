@@ -105,7 +105,7 @@ export class ChatGPTProvider implements Provider {
       onMessage(message: string) {
         console.debug('sse message', message)
         if (message === '[DONE]') {
-          params.onEvent({ type: 'done' })
+          params.onEvent({ event: 'done' })
           cleanup()
           return
         }
@@ -120,10 +120,10 @@ export class ChatGPTProvider implements Provider {
         if (text) {
           conversationId = data.conversation_id
           params.onEvent({
-            type: 'answer',
+            event: 'answer',
             data: {
               text,
-              messageId: data.message.id,
+              questionId: data.message.id,
               conversationId: data.conversation_id,
             },
           })

@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import Browser from 'webextension-polyfill'
 import { captureEvent } from '../analytics'
-import { Answer } from '../messaging'
+import { OldAnswer } from '../messaging'
 import ChatGPTFeedback from './ChatGPTFeedback'
 import { isBraveBrowser, shouldShowRatingTip } from './utils.js'
 
@@ -17,7 +17,7 @@ interface Props {
 }
 
 function ChatGPTQuery(props: Props) {
-  const [answer, setAnswer] = useState<Answer | null>(null)
+  const [answer, setAnswer] = useState<OldAnswer | null>(null)
   const [error, setError] = useState('')
   const [retry, setRetry] = useState(0)
   const [done, setDone] = useState(false)
@@ -37,7 +37,7 @@ function ChatGPTQuery(props: Props) {
       } else if (msg.error) {
         setError(msg.error)
         setStatus('error')
-      } else if (msg.event === 'DONE') {
+      } else if (msg.event === 'done') {
         setDone(true)
       }
     }
@@ -86,7 +86,7 @@ function ChatGPTQuery(props: Props) {
             <GearIcon size={14} />
           </span>
           <ChatGPTFeedback
-            messageId={answer.messageId}
+            messageId={answer.questionId}
             conversationId={answer.conversationId}
             answerText={answer.text}
           />

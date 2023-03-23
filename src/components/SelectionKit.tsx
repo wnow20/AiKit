@@ -1,45 +1,37 @@
 import React from 'react'
-import { getUserConfig, Language } from '../config'
+
+import { v4 as uuidv4 } from 'uuid'
 import ChatIcon from './chat.svg'
+import { Question } from './DialogBox'
 import SummarizeIcon from './summarize.svg'
 import TranslateIcon from './translate.svg'
 
 interface SelectionKitProps {
   content: string
-  onCompletionRequest?: (prompt: string) => void
-}
-
-function generateTranslatePrompt(content: string, language: Language) {
-  return (
-    `Translate the following into ${language} and only show me the translated content.` +
-    `If it is already in ${language},` +
-    `translate it into English and only show me the translated content:\n"${content}"`
-  )
-}
-
-function generateSummarizePrompt(content: string, language: Language) {
-  return `Reply in ${language}.Summarize the following as concisely as possible:\n"${content}"`
-}
-
-function generateChatPrompt(content: string, language: Language) {
-  return `Reply in ${language}.Analyze the following content and express your opinion,or give your answer:\n"${content}"`
+  onCompletionRequest?: (question: Question) => void
 }
 
 export default function SelectionKit(props: SelectionKitProps) {
   const { content, onCompletionRequest } = props
   const handleTranslateClick = React.useCallback(() => {
-    getUserConfig().then((userConfig) => {
-      onCompletionRequest?.(generateTranslatePrompt(content, userConfig.language))
+    onCompletionRequest?.({
+      type: 'translate',
+      text: content,
+      id: uuidv4(),
     })
   }, [content, onCompletionRequest])
   const handleSummarizeClick = React.useCallback(() => {
-    getUserConfig().then((userConfig) => {
-      onCompletionRequest?.(generateSummarizePrompt(content, userConfig.language))
+    onCompletionRequest?.({
+      type: 'summarize',
+      text: content,
+      id: uuidv4(),
     })
   }, [content, onCompletionRequest])
   const handleChatClick = React.useCallback(() => {
-    getUserConfig().then((userConfig) => {
-      onCompletionRequest?.(generateChatPrompt(content, userConfig.language))
+    onCompletionRequest?.({
+      type: 'chat',
+      text: content,
+      id: uuidv4(),
     })
   }, [content, onCompletionRequest])
 

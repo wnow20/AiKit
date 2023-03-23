@@ -1,25 +1,60 @@
 import React from 'react'
 import Draggable from 'react-draggable'
+import { v4 as uuidv4 } from 'uuid'
 import Browser from 'webextension-polyfill'
+import { AiEvent } from '../background/types'
 import AvatarIcon from './avatar.svg'
+import { updateByAiEvent } from './converse'
+import CursorBlock from './CursorBlock'
 import './DialogBox.scss'
 import OpenAIIcon from './openai.svg'
+import QuestionTag from './QuestionTag'
 import SendIcon from './send.svg'
 
 interface DialogBoxProps {
-  prompt?: string
+  question?: Question
 }
 
-interface Message {
+export type Role = 'user' | 'assistant'
+
+export type AnswerStatus = 'not_started' | 'error' | 'progressing' | 'succeed'
+
+export interface Message {
   id?: string
-  role: string
+  role: Role
+  qType?: QuestionType
   data: string
-  status?: 'not_started' | 'error' | 'progressing' | 'succeed'
+  status?: AnswerStatus
   error?: string
 }
 
 interface DialogItemProps {
   message: Message
+}
+
+export type QuestionType = 'translate' | 'summarize' | 'chat'
+
+export interface Question {
+  text: string
+  type: QuestionType
+  id: string
+}
+
+export interface Answer {
+  text: string
+  id: string
+  status: AnswerStatus
+  error?: string
+}
+
+export interface QnA {
+  question: Question
+  answer: Answer
+}
+
+export interface Conversation {
+  id: string
+  qnaList: QnA[]
 }
 
 function DialogItem(props: DialogItemProps) {
@@ -33,7 +68,11 @@ function DialogItem(props: DialogItemProps) {
         </div>
       </div>
       <div className="dialog-content-wrapper">
-        <div className="dialog-content">{message.data}</div>
+        <div className="dialog-content">
+          <QuestionTag type={message.qType} />
+          {message.data}
+          {message.status === 'progressing' ? <CursorBlock /> : null}
+        </div>
       </div>
     </div>
   )
@@ -60,59 +99,49 @@ function updateByMsgId(
 }
 
 function DialogBox(props: DialogBoxProps) {
-  const { prompt } = props
+  const { question } = props
+  const [conversation, setConversation] = React.useState<Conversation>()
+
   const [text, setText] = React.useState('')
   const [inputHeight, setInputHeight] = React.useState(24)
-  const [messages, setMessages] = React.useState<Message[]>([])
 
   React.useEffect(() => {
-    if (!prompt) {
+    if (question) {
+      setConversation({
+        id: uuidv4(),
+        qnaList: [
+          {
+            question,
+            answer: {
+              id: uuidv4(),
+              text: '',
+              status: 'progressing',
+            },
+          },
+        ],
+      })
+    }
+  }, [question])
+
+  React.useEffect(() => {
+    if (!question) {
       return
     }
-    setMessages([
-      {
-        role: 'user',
-        data: prompt,
-        status: 'not_started',
-      },
-    ])
     const port = Browser.runtime.connect()
-    const listener = (msg: any) => {
+    const listener = (msg: AiEvent) => {
       console.log('received answer', msg)
-      if (msg.text) {
-        setMessages((prev) => {
-          return updateByMsgId(prev, msg, (prevItem) => ({
-            ...prevItem,
-            data: msg.text,
-            status: 'progressing',
-          }))
-        })
-      } else if (msg.error) {
-        setMessages((prev) => {
-          return updateByMsgId(prev, msg, (prevItem) => ({
-            ...prevItem,
-            data: msg.text,
-            status: 'error',
-            error: msg.error,
-          }))
-        })
-      } else if (msg.event === 'DONE') {
-        setMessages((prev) => {
-          return updateByMsgId(prev, msg, (prevItem) => ({
-            ...prevItem,
-            status: 'succeed',
-          }))
-        })
-      }
+      setConversation((prev) => {
+        return updateByAiEvent(prev, msg)
+      })
     }
     port.onMessage.addListener(listener)
-    console.log('postMessage', prompt)
-    port.postMessage({ question: prompt })
+    console.log('postMessage', question)
+    port.postMessage({ question })
     return () => {
       port.onMessage.removeListener(listener)
       port.disconnect()
     }
-  }, [prompt])
+  }, [question])
 
   const handleInputChange = React.useCallback((e) => {
     setText(() => {
@@ -137,6 +166,36 @@ function DialogBox(props: DialogBoxProps) {
     }
   }, [])
 
+  const handleSendClick = React.useCallback((e) => {
+    e.preventDefault()
+
+    // submit();
+  }, [])
+
+  const messages = React.useMemo(() => {
+    const msgList: Message[] = []
+    conversation?.qnaList.forEach((qna) => {
+      msgList.push({
+        status: 'succeed',
+        role: 'user',
+        data: qna.question.text,
+        id: qna.question.id,
+        qType: qna.question.type,
+      })
+      msgList.push({
+        status: qna.answer.status,
+        role: 'assistant',
+        data: qna.answer.text,
+        id: qna.answer.id,
+      })
+    })
+    return msgList
+  }, [conversation])
+
+  console.log('messages')
+  console.log(messages)
+  console.log(conversation)
+
   return (
     <Draggable handle=".dialog-header">
       <div className="aikit-dialog-box" style={{ width: 400, height: 450 }}>
@@ -155,7 +214,7 @@ function DialogBox(props: DialogBoxProps) {
             onChange={handleInputChange}
             style={{ maxHeight: '120px', height: `${inputHeight}px` }}
           ></textarea>
-          <a role="button" className="send">
+          <a role="button" className="send" onClick={handleSendClick}>
             <SendIcon />
           </a>
         </div>

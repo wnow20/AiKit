@@ -1,5 +1,5 @@
-export interface Answer {
+export interface OldAnswer {
   text: string
-  messageId: string
+  questionId: string
   conversationId: string
 }

@@ -36,7 +36,7 @@ export class OpenAIProvider implements Provider {
       onMessage(message) {
         console.debug('sse message', message)
         if (message === '[DONE]') {
-          params.onEvent({ type: 'done' })
+          params.onEvent({ event: 'done' })
           return
         }
         let data
@@ -48,10 +48,10 @@ export class OpenAIProvider implements Provider {
           }
           result += text
           params.onEvent({
-            type: 'answer',
+            event: 'answer',
             data: {
               text: result,
-              messageId: data.id,
+              questionId: data.id,
               conversationId: data.id,
             },
           })

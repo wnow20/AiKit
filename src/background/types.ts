@@ -1,17 +1,29 @@
-import { Answer } from '../messaging'
+import { OldAnswer } from '../messaging'
 
-export type Event =
+export type AiEvent =
   | {
-      type: 'answer'
-      data: Answer
+      event: 'answer' | 'done'
+      data: OldAnswer
     }
   | {
-      type: 'done'
+      error: string
+      data: {
+        questionId: string
+      }
+    }
+
+export type StreamEvent =
+  | {
+      event: 'done'
+    }
+  | {
+      event: 'answer'
+      data: OldAnswer
     }
 
 export interface GenerateAnswerParams {
   prompt: string
-  onEvent: (event: Event) => void
+  onEvent: (event: StreamEvent) => void
   signal?: AbortSignal
 }
 
