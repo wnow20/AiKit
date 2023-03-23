@@ -3,7 +3,7 @@ import Draggable from 'react-draggable'
 import { v4 as uuidv4 } from 'uuid'
 import Browser, { Runtime } from 'webextension-polyfill'
 import { AiEvent } from '../background/types'
-import { isApproachBottom, scrollToBottom } from '../domUtils'
+import { scrollToBottom } from '../domUtils'
 import useUpdateEffect from '../useUpdateEffect'
 import AvatarIcon from './avatar.svg'
 import { updateByAiEvent } from './converse'
@@ -228,9 +228,7 @@ function DialogBox(props: DialogBoxProps) {
       return
     }
     requestAnimationFrame(() => {
-      scrollRef.current &&
-        isApproachBottom(scrollRef.current, 50) &&
-        scrollToBottom(scrollRef.current)
+      scrollRef.current && scrollToBottom(scrollRef.current)
     })
   }, [conversation])
 
