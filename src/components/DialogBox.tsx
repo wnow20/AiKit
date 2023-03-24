@@ -100,9 +100,13 @@ function DialogBox(props: DialogBoxProps) {
   const { question } = props
   const [conversation, setConversation] = React.useState<Conversation>()
   const portRef = React.useRef<Runtime.Port>()
+  const inputRef = React.useRef<HTMLTextAreaElement>(null)
   const scrollRef = React.useRef<HTMLDivElement>(null)
   const [text, setText] = React.useState('')
   const [inputHeight, setInputHeight] = React.useState(24)
+  const [isChat, setIsChat] = React.useState<boolean>(() => {
+    return question == null || question?.type === 'chat'
+  })
 
   React.useEffect(() => {
     if (question) {
@@ -237,9 +241,17 @@ function DialogBox(props: DialogBoxProps) {
     // TODO
   }, [])
 
+  const height = isChat ? 450 : undefined
+
+  const handleTriggerChatClick = React.useCallback(() => {
+    setIsChat(true)
+    requestAnimationFrame(() => {
+      inputRef.current?.focus()
+    })
+  }, [])
   return (
     <Draggable handle=".dialog-header">
-      <div className="aikit-dialog-box" style={{ width: 400, height: 450 }}>
+      <div className="aikit-dialog-box" style={{ width: 400, height }}>
         <div className="dialog-header"></div>
         <div className="dialog-list" ref={scrollRef}>
           {messages.map((message, index) => (
@@ -256,19 +268,26 @@ function DialogBox(props: DialogBoxProps) {
             </div>
           ) : null}
         </div>
-        <div className="message-input-wrapper">
-          <textarea
-            placeholder="CMD+回车发送"
-            className="message-input"
-            value={text}
-            onKeyDownCapture={handleKeyDown}
-            onChange={handleInputChange}
-            style={{ maxHeight: '120px', height: `${inputHeight}px` }}
-          ></textarea>
-          <a role="button" className="send" onClick={handleSendClick}>
-            <SendIcon />
-          </a>
-        </div>
+        {isChat ? (
+          <div className="message-input-wrapper">
+            <textarea
+              placeholder="CMD+回车发送"
+              className="message-input"
+              ref={inputRef}
+              value={text}
+              onKeyDownCapture={handleKeyDown}
+              onChange={handleInputChange}
+              style={{ maxHeight: '120px', height: `${inputHeight}px` }}
+            ></textarea>
+            <a role="button" className="send" onClick={handleSendClick}>
+              <SendIcon />
+            </a>
+          </div>
+        ) : (
+          <div className="triggerChat" onClick={handleTriggerChatClick}>
+            开始聊天
+          </div>
+        )}
       </div>
     </Draggable>
   )

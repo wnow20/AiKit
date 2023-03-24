@@ -94,6 +94,7 @@
     text-align: center;
     padding: 5px 10px;
   }
+
   .regenerate-btn {
     align-items: center;
     border-color: transparent;
@@ -110,10 +111,23 @@
     .btn-icon {
       font-size: 1em;
       padding: 3px;
+
       svg {
         width: 0.75em;
         height: 0.75em;
       }
+    }
+  }
+
+  .triggerChat {
+    text-align: center;
+    color: #666666;
+    padding: 0.5em;
+    font-size: .8em;
+    cursor: pointer;
+
+    &:hover {
+      color: #333333;
     }
   }
 }

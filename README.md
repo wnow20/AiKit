@@ -9,8 +9,9 @@
 - [x] CMD+K 唤起智能框，类似Spotlight
 - [x] 对话框，有新增消息是自动滚动到最后
 - [x] Chat
-- re-generate
-- 翻译、概述只读模式
+- [ ] re-generate
+- [x] 翻译、概述只读模式
+- 弹框出现位置
 - popup
 - 对话框支持代码高亮、复制
 - 上下文chat
