@@ -14,14 +14,14 @@ async function generateAnswers(port: Browser.Runtime.Port, question: string | Qu
     cleanup?.()
   })
   let prompt: string
-  let messageId = 'nil'
+  let questionId = 'nil'
   let message = ''
   if (typeof question === 'string') {
     prompt = question
   } else {
     const userConfig = await getUserConfig()
     prompt = convert2Prompt(question, userConfig.language)
-    messageId = question.id
+    questionId = question.id
   }
 
   const { cleanup } = await provider.generateAnswer({
@@ -34,7 +34,7 @@ async function generateAnswers(port: Browser.Runtime.Port, question: string | Qu
           event: 'done',
           data: {
             text: message,
-            questionId: messageId,
+            questionId: questionId,
             conversationId: '',
           },
         }
@@ -42,16 +42,17 @@ async function generateAnswers(port: Browser.Runtime.Port, question: string | Qu
         return
       }
       if (typeof question === 'string') {
-        messageId = event.data.questionId
+        questionId = event.data.questionId
       }
       message = event.data.text
-      port.postMessage({
+      const aiEvent = {
         event: 'answer',
         data: {
           ...event.data,
-          messageId,
+          questionId: questionId,
         },
-      })
+      } as AiEvent
+      port.postMessage(aiEvent)
     },
   })
 }
