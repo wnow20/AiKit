@@ -81,26 +81,6 @@ function DialogItem(props: DialogItemProps) {
   )
 }
 
-function updateByMsgId(
-  prev: Message[],
-  msg: any,
-  updator: (prevItem: Message) => Message,
-): Message[] {
-  const index = prev.findIndex((x) => msg.messageId === x.id)
-  if (index === -1) {
-    return [
-      ...prev,
-      updator({
-        id: msg.messageId,
-        data: msg.text,
-        role: 'assistant',
-      }),
-    ]
-  }
-  const prevItem = prev[index]
-  return [...prev.slice(0, index), updator(prevItem), ...prev.slice(index + 1)]
-}
-
 function newQnA(text: string): QnA {
   return {
     question: {
