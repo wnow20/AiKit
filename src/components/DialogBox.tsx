@@ -2,7 +2,7 @@ import React from 'react'
 import Draggable from 'react-draggable'
 import { v4 as uuidv4 } from 'uuid'
 import Browser, { Runtime } from 'webextension-polyfill'
-import { AiEvent } from '../background/types'
+import type { AiEvent, Conversation, Message, QnA, Question } from '../background/types'
 import { scrollToBottom } from '../domUtils'
 import AvatarIcon from '../images/avatar.svg'
 import OpenAIIcon from '../images/openai.svg'
@@ -18,46 +18,8 @@ interface DialogBoxProps {
   question?: Question
 }
 
-export type Role = 'user' | 'assistant'
-
-export type AnswerStatus = 'not_started' | 'error' | 'progressing' | 'succeed'
-
-export interface Message {
-  id?: string
-  role: Role
-  qType?: QuestionType
-  data: string
-  status?: AnswerStatus
-  error?: string
-}
-
 interface DialogItemProps {
   message: Message
-}
-
-export type QuestionType = 'translate' | 'summarize' | 'chat'
-
-export interface Question {
-  text: string
-  type: QuestionType
-  id: string
-}
-
-export interface Answer {
-  text: string
-  id: string
-  status: AnswerStatus
-  error?: string
-}
-
-export interface QnA {
-  question: Question
-  answer: Answer
-}
-
-export interface Conversation {
-  id: string
-  qnaList: QnA[]
 }
 
 function DialogItem(props: DialogItemProps) {

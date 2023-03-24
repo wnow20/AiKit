@@ -1,5 +1,4 @@
-import { AiEvent } from '../background/types'
-import { Conversation, QnA } from './DialogBox'
+import type { AiEvent, Conversation, QnA } from '../background/types'
 
 export function updateByAiEvent(
   prev: Conversation | undefined,

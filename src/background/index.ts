@@ -1,10 +1,9 @@
 import Browser from 'webextension-polyfill'
 import apiProvider from '../apiProvider'
-import { Question } from '../components/DialogBox'
 import { getUserConfig } from '../config'
 import convert2Prompt from '../promptConverter'
 import { getChatGPTAccessToken, sendMessageFeedback } from './providers/chatgpt'
-import { AiEvent } from './types'
+import type { AiEvent, Question } from './types'
 
 async function generateAnswers(port: Browser.Runtime.Port, question: string | Question) {
   const provider = await apiProvider()

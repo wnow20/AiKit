@@ -1,4 +1,4 @@
-import { Question } from './components/DialogBox'
+import type { Question } from './background/types'
 import { Language } from './config'
 
 function generateTranslatePrompt(content: string, language: Language) {

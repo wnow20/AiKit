@@ -1,8 +1,7 @@
 import { describe, expect, test } from '@jest/globals'
 import * as uuid from 'uuid'
-import { AiEvent } from '../background/types'
+import type { AiEvent, Conversation } from '../background/types'
 import { updateByAiEvent } from './converse'
-import { Conversation } from './DialogBox'
 
 describe('converse', () => {
   test('updateByQuestionId', () => {

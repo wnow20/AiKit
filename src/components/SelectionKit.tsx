@@ -1,10 +1,10 @@
 import React from 'react'
 
 import { v4 as uuidv4 } from 'uuid'
+import type { Question } from '../background/types'
 import ChatIcon from '../images/chat.svg'
 import SummarizeIcon from '../images/summarize.svg'
 import TranslateIcon from '../images/translate.svg'
-import { Question } from './DialogBox'
 
 interface SelectionKitProps {
   content: string

@@ -1,4 +1,4 @@
-import { QuestionType } from './DialogBox'
+import type { QuestionType } from '../background/types'
 import './QuestionTag.scss'
 
 interface QuestionTagProps {

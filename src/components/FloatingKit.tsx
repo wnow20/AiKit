@@ -1,5 +1,6 @@
 import React from 'react'
-import DialogBox, { Question } from './DialogBox'
+import type { Question } from '../background/types'
+import DialogBox from './DialogBox'
 import SelectionKit from './SelectionKit'
 
 interface FloatingKitProps {
