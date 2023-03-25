@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'preact/hooks'
 import React from 'react'
-import Draggable from 'react-draggable'
+import Draggable, { ControlPosition, DraggableData, DraggableEvent } from 'react-draggable'
 import { v4 as uuidv4 } from 'uuid'
 import Browser, { Runtime } from 'webextension-polyfill'
 import type { AiEvent, Conversation, Message, QnA, Question } from '../background/types'
 import { ProviderType } from '../config'
 import ChatGPTError from '../content-script/ChatGPTError'
-import { scrollToBottom } from '../domUtils'
+import { elementBoundCheck, scrollToBottom } from '../domUtils'
 import AvatarIcon from '../images/avatar.svg'
 import OpenAIIcon from '../images/openai.svg'
 import RefreshIcon from '../images/refresh.svg'
@@ -75,6 +75,7 @@ function DialogBox(props: DialogBoxProps) {
   })
   const [retry, setRetry] = useState(0)
   const aiProvider = useAiProvider()
+  const dialogBoxRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
     if (question) {
@@ -279,9 +280,18 @@ function DialogBox(props: DialogBoxProps) {
     }
   }, [error, sendRetry])
 
+  const [position, setPosition] = React.useState<ControlPosition>()
+  React.useEffect(() => {
+    const result = elementBoundCheck(dialogBoxRef?.current)
+    result && setPosition(result)
+  }, [])
+
+  const handDragStop = React.useCallback((e: DraggableEvent, data: DraggableData) => {
+    setPosition(data)
+  }, [])
   return (
-    <Draggable handle=".dialog-header">
-      <div className="aikit-dialog-box" style={{ width: 400, height }}>
+    <Draggable handle=".dialog-header" position={position} onStop={handDragStop}>
+      <div className="aikit-dialog-box" ref={dialogBoxRef} style={{ width: 400, height }}>
         <div className="dialog-header"></div>
         <div className="dialog-list" ref={scrollRef}>
           {messages.map((message, index) => (
