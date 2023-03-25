@@ -1,14 +1,18 @@
+import { useEffect, useState } from 'preact/hooks'
 import React from 'react'
 import Draggable from 'react-draggable'
 import { v4 as uuidv4 } from 'uuid'
 import Browser, { Runtime } from 'webextension-polyfill'
 import type { AiEvent, Conversation, Message, QnA, Question } from '../background/types'
+import { ProviderType } from '../config'
+import ChatGPTError from '../content-script/ChatGPTError'
 import { scrollToBottom } from '../domUtils'
 import AvatarIcon from '../images/avatar.svg'
 import OpenAIIcon from '../images/openai.svg'
 import RefreshIcon from '../images/refresh.svg'
 import SendIcon from '../images/send.svg'
 import useUpdateEffect from '../useUpdateEffect'
+import useAiProvider from '../utils/useProvider'
 import { updateByAiEvent } from './converse'
 import CursorBlock from './CursorBlock'
 import './DialogBox.scss'
@@ -69,6 +73,8 @@ function DialogBox(props: DialogBoxProps) {
   const [isChat, setIsChat] = React.useState<boolean>(() => {
     return question == null || question?.type === 'chat'
   })
+  const [retry, setRetry] = useState(0)
+  const aiProvider = useAiProvider()
 
   React.useEffect(() => {
     if (question) {
@@ -180,7 +186,7 @@ function DialogBox(props: DialogBoxProps) {
 
   const messages = React.useMemo(() => {
     const msgList: Message[] = []
-    conversation?.qnaList.forEach((qna) => {
+    conversation?.qnaList?.forEach((qna) => {
       msgList.push({
         status: 'succeed',
         role: 'user',
@@ -211,6 +217,29 @@ function DialogBox(props: DialogBoxProps) {
       inputRef.current?.focus()
     })
   }, [])
+
+  const error = React.useMemo(() => {
+    const qnaList = conversation?.qnaList
+    if (!qnaList || !qnaList.length) {
+      return
+    }
+    return qnaList[qnaList.length - 1].answer.error
+  }, [conversation])
+
+  // retry error on focus
+  useEffect(() => {
+    const onFocus = () => {
+      if (error && (error == 'UNAUTHORIZED' || error === 'CLOUDFLARE')) {
+        // setError('')
+        // setRetry((r) => r + 1)
+      }
+    }
+    window.addEventListener('focus', onFocus)
+    return () => {
+      window.removeEventListener('focus', onFocus)
+    }
+  }, [error])
+
   return (
     <Draggable handle=".dialog-header">
       <div className="aikit-dialog-box" style={{ width: 400, height }}>
@@ -219,14 +248,19 @@ function DialogBox(props: DialogBoxProps) {
           {messages.map((message, index) => (
             <DialogItem key={index} message={message} />
           ))}
-          {messages.length && messages[messages.length - 1].error ? (
+          {error ? (
             <div className="dialog-list-tail">
-              <button className="regenerate-btn" onClick={handleRegenerateClick}>
-                <span className="btn-icon">
-                  <RefreshIcon />
-                </span>{' '}
-                重新生成
-              </button>
+              {aiProvider?.provider === ProviderType.ChatGPT ? (
+                <ChatGPTError error={error} retry={retry} />
+              ) : null}
+              {aiProvider?.provider === ProviderType.OpenAI ? (
+                <button className="regenerate-btn" onClick={handleRegenerateClick}>
+                  <span className="btn-icon">
+                    <RefreshIcon />
+                  </span>
+                  &nbsp;重新生成
+                </button>
+              ) : null}
             </div>
           ) : null}
         </div>

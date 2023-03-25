@@ -1,4 +1,4 @@
-# ChatGPT for Google
+# AiKit
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/wong2/chatgpt-google-extension/pre-release-build.yml)
 ![Visitors](https://visitor-badge.glitch.me/badge?page_id=wong2.chat-gpt-google-extension&left_color=green&right_color=red)
@@ -9,11 +9,14 @@
 - [x] CMD+K 唤起智能框，类似Spotlight
 - [x] 对话框，有新增消息是自动滚动到最后
 - [x] Chat
-- [ ] re-generate
 - [x] 翻译、概述只读模式
+- [x] options 改造及中文化
+- [x] ChatGPT 错误提示
+- [ ] re-generate
 - 弹框出现位置
 - popup
 - 对话框支持代码高亮、复制
+- 一键切换为AiKit官方接口
 - 上下文chat
 - 鼠标右键：翻译、summary、支持配置
 - 多语言

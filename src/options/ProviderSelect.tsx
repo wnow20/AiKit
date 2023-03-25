@@ -16,12 +16,12 @@ async function loadModels(): Promise<string[]> {
 
 const ConfigPanel: FC<ConfigProps> = ({ config, models }) => {
   const [tab, setTab] = useState<ProviderType>(config.provider)
-  const { bindings: apiKeyBindings } = useInput(config.configs[ProviderType.GPT3]?.apiKey ?? '')
-  const [model, setModel] = useState(config.configs[ProviderType.GPT3]?.model ?? models[0])
+  const { bindings: apiKeyBindings } = useInput(config.configs[ProviderType.OpenAI]?.apiKey ?? '')
+  const [model, setModel] = useState(config.configs[ProviderType.OpenAI]?.model ?? models[0])
   const { setToast } = useToasts()
 
   const save = useCallback(async () => {
-    if (tab === ProviderType.GPT3) {
+    if (tab === ProviderType.OpenAI) {
       if (!apiKeyBindings.value) {
         alert('Please enter your OpenAI API key')
         return
@@ -32,7 +32,7 @@ const ConfigPanel: FC<ConfigProps> = ({ config, models }) => {
       }
     }
     await saveProviderConfigs(tab, {
-      [ProviderType.GPT3]: {
+      [ProviderType.OpenAI]: {
         model,
         apiKey: apiKeyBindings.value,
       },
@@ -43,14 +43,25 @@ const ConfigPanel: FC<ConfigProps> = ({ config, models }) => {
   return (
     <div className="flex flex-col gap-3">
       <Tabs value={tab} onChange={(v) => setTab(v as ProviderType)}>
-        <Tabs.Item label="ChatGPT webapp" value={ProviderType.ChatGPT}>
-          The API that powers ChatGPT webapp, free, but sometimes unstable
+        <Tabs.Item label="AiKit接口" value={ProviderType.AiKit}>
+          AiKit网络服务，稳定高速，免费3个月，
+          <span className="font-semibold">按量收费</span>，详见
+          <a
+            href="https://www.yuque.com/wnow20/urfk3b/hu0ox2n4xx6fwp63"
+            target="_blank"
+            rel="noreferrer"
+          >
+            收费政策
+          </a>
         </Tabs.Item>
-        <Tabs.Item label="OpenAI API" value={ProviderType.GPT3}>
+        <Tabs.Item label="ChatGPT" value={ProviderType.ChatGPT}>
+          ChatGPT网络服务，免费，需科学上网，网络不稳定
+        </Tabs.Item>
+        <Tabs.Item label="OpenAI接口" value={ProviderType.OpenAI}>
           <div className="flex flex-col gap-2">
             <span>
-              OpenAI official API, more stable,{' '}
-              <span className="font-semibold">charge by usage</span>
+              OpenAI官方接口，需科学上网，网络不稳定，
+              <span className="font-semibold">按量收费</span>
             </span>
             <div className="flex flex-row gap-2">
               <Select
@@ -68,20 +79,21 @@ const ConfigPanel: FC<ConfigProps> = ({ config, models }) => {
               <Input htmlType="password" label="API key" scale={2 / 3} {...apiKeyBindings} />
             </div>
             <span className="italic text-xs">
-              You can find or create your API key{' '}
+              科学上网并访问
               <a
                 href="https://platform.openai.com/account/api-keys"
                 target="_blank"
                 rel="noreferrer"
               >
-                here
+                OpenAI账户中心
               </a>
+              ，注册OpenAI
             </span>
           </div>
         </Tabs.Item>
       </Tabs>
       <Button scale={2 / 3} ghost style={{ width: 20 }} type="success" onClick={save}>
-        Save
+        保存
       </Button>
     </div>
   )

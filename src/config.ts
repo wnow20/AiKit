@@ -8,14 +8,14 @@ export enum TriggerMode {
 }
 
 export const TRIGGER_MODE_TEXT = {
-  [TriggerMode.Always]: { title: 'Always', desc: 'ChatGPT is queried on every search' },
+  [TriggerMode.Always]: { title: '总是', desc: '每次搜索时总是发起AI询问' },
   [TriggerMode.QuestionMark]: {
-    title: 'Question Mark',
-    desc: 'When your query ends with a question mark (?)',
+    title: '问号结尾',
+    desc: '在问号结尾的时候发起AI询问',
   },
   [TriggerMode.Manually]: {
-    title: 'Manually',
-    desc: 'ChatGPT is queried when you manually click a button',
+    title: '手动',
+    desc: '手动点击按钮是发起AI询问',
   },
 }
 
@@ -25,39 +25,47 @@ export enum Theme {
   Dark = 'dark',
 }
 
+export const THEME_TEXT = {
+  [Theme.Auto]: '自动',
+  [Theme.Light]: '亮',
+  [Theme.Dark]: '暗',
+}
+
 export enum Language {
   Auto = 'auto',
   English = 'english',
   Chinese = 'chinese',
-  Spanish = 'spanish',
-  French = 'french',
-  Korean = 'korean',
-  Japanese = 'japanese',
-  German = 'german',
-  Portuguese = 'portuguese',
 }
 
-const userConfigWithDefaultValue = {
+// TODO 多语言支持
+export const LANG_TEXT: Record<string, string> = {
+  [Language.Auto]: '自动',
+  [Language.English]: '英语',
+  [Language.Chinese]: '简体中文',
+}
+
+export enum ProviderType {
+  ChatGPT = 'chatgpt',
+  AiKit = 'aikit',
+  OpenAI = 'gpt3',
+}
+
+export const defaultUserConfig = {
   triggerMode: TriggerMode.Always,
   theme: Theme.Auto,
-  language: Language.Auto,
+  language: Language.Chinese,
 }
 
-export type UserConfig = typeof userConfigWithDefaultValue
+export type UserConfig = typeof defaultUserConfig
 
 export async function getUserConfig(): Promise<UserConfig> {
-  const result = await Browser.storage.local.get(Object.keys(userConfigWithDefaultValue))
-  return defaults(result, userConfigWithDefaultValue)
+  const result = await Browser.storage.local.get(Object.keys(defaultUserConfig))
+  return defaults(result, defaultUserConfig)
 }
 
 export async function updateUserConfig(updates: Partial<UserConfig>) {
   console.debug('update configs', updates)
   return Browser.storage.local.set(updates)
-}
-
-export enum ProviderType {
-  ChatGPT = 'chatgpt',
-  GPT3 = 'gpt3',
 }
 
 interface GPT3ProviderConfig {
@@ -68,18 +76,18 @@ interface GPT3ProviderConfig {
 export interface ProviderConfigs {
   provider: ProviderType
   configs: {
-    [ProviderType.GPT3]: GPT3ProviderConfig | undefined
+    [ProviderType.OpenAI]: GPT3ProviderConfig | undefined
   }
 }
 
 export async function getProviderConfigs(): Promise<ProviderConfigs> {
-  const { provider = ProviderType.ChatGPT } = await Browser.storage.local.get('provider')
-  const configKey = `provider:${ProviderType.GPT3}`
+  const { provider = ProviderType.OpenAI } = await Browser.storage.local.get('provider')
+  const configKey = `provider:${ProviderType.OpenAI}`
   const result = await Browser.storage.local.get(configKey)
   return {
     provider,
     configs: {
-      [ProviderType.GPT3]: result[configKey],
+      [ProviderType.OpenAI]: result[configKey],
     },
   }
 }
@@ -90,6 +98,6 @@ export async function saveProviderConfigs(
 ) {
   return Browser.storage.local.set({
     provider,
-    [`provider:${ProviderType.GPT3}`]: configs[ProviderType.GPT3],
+    [`provider:${ProviderType.OpenAI}`]: configs[ProviderType.OpenAI],
   })
 }

@@ -9,8 +9,8 @@ export default async function apiProvider(): Promise<Provider> {
   if (providerConfigs.provider === ProviderType.ChatGPT) {
     const token = await getChatGPTAccessToken()
     return new ChatGPTProvider(token)
-  } else if (providerConfigs.provider === ProviderType.GPT3) {
-    const { apiKey, model } = providerConfigs.configs[ProviderType.GPT3]!
+  } else if (providerConfigs.provider === ProviderType.OpenAI) {
+    const { apiKey, model } = providerConfigs.configs[ProviderType.OpenAI]!
     return new OpenAIProvider(apiKey, model)
   } else {
     throw new Error(`Unknown provider ${providerConfigs.provider}`)
