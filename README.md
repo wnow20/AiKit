@@ -9,7 +9,7 @@ AiKit - AI工具箱
 - [x] options 改造及中文化
 - [x] ChatGPT 错误提示
 - [x] re-generate
-- [ ] popup
+- [x] popup
 - [ ] aikit provider 
 - 弹框出现位置
 - 更换LOGO
