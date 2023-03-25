@@ -1,4 +1,4 @@
 import { render } from 'preact'
-import App from './App'
+import Options from './Options'
 
-render(<App />, document.getElementById('app')!)
+render(<Options />, document.getElementById('optionsRoot')!)

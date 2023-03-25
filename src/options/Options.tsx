@@ -131,7 +131,7 @@ function OptionsPage(props: { theme: Theme; onThemeChange: (theme: Theme) => voi
   )
 }
 
-function App() {
+function Options() {
   const [theme, setTheme] = useState(Theme.Auto)
 
   const themeType = useMemo(() => {
@@ -153,4 +153,4 @@ function App() {
   )
 }
 
-export default App
+export default Options

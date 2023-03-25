@@ -10,7 +10,7 @@ AiKit - AI工具箱
 - [x] ChatGPT 错误提示
 - [x] re-generate
 - [x] popup
-- [ ] aikit provider 
+- [x] aikit provider 
 - 弹框出现位置
 - 更换LOGO
 - 对话框支持代码高亮、复制
