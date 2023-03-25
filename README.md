@@ -11,6 +11,7 @@ AiKit - AI工具箱
 - [x] re-generate
 - 弹框出现位置
 - popup
+- 更换LOGO
 - 对话框支持代码高亮、复制
 - 一键切换为AiKit官方接口
 - 上下文chat

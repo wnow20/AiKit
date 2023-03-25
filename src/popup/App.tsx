@@ -1,26 +1,42 @@
-import { GearIcon, GlobeIcon } from '@primer/octicons-react'
+import { GearIcon } from '@primer/octicons-react'
 import { useCallback } from 'react'
 import useSWR from 'swr'
 import Browser from 'webextension-polyfill'
 import '../base.css'
+import DialogBox from '../components/DialogBox'
+import { ProviderType } from '../config'
 import logo from '../logo.png'
+import useAiProvider from '../utils/useProvider'
+import ChatGPTWebFrame from './ChatGPTWebFrame'
 
 const isChrome = /chrome/i.test(navigator.userAgent)
 
-function App() {
-  const accessTokenQuery = useSWR(
-    'accessToken',
-    () => Browser.runtime.sendMessage({ type: 'GET_ACCESS_TOKEN' }),
-    { shouldRetryOnError: false },
-  )
-  const hideShortcutsTipQuery = useSWR('hideShortcutsTip', async () => {
-    const { hideShortcutsTip } = await Browser.storage.local.get('hideShortcutsTip')
-    return !!hideShortcutsTip
-  })
+const SHORTCUTS_TIP_KEY = 'hideShortcutsTip'
 
+// Browser.storage.local.remove(SHORTCUTS_TIP_KEY)
+
+function PopupHeader() {
   const openOptionsPage = useCallback(() => {
     Browser.runtime.sendMessage({ type: 'OPEN_OPTIONS_PAGE' })
   }, [])
+
+  return (
+    <div className="mb-2 flex flex-row items-center px-1">
+      <img src={logo} className="w-5 h-5 rounded-sm" />
+      <p className="text-sm font-semibold m-0 ml-1">AiKit</p>
+      <div className="grow"></div>
+      <span className="cursor-pointer leading-[0]" onClick={openOptionsPage}>
+        <GearIcon size={16} />
+      </span>
+    </div>
+  )
+}
+
+function ShortCutsTip() {
+  const hideShortcutsTipQuery = useSWR(SHORTCUTS_TIP_KEY, async () => {
+    const { hideShortcutsTip } = await Browser.storage.local.get(SHORTCUTS_TIP_KEY)
+    return !!hideShortcutsTip
+  })
 
   const openShortcutsPage = useCallback(() => {
     Browser.storage.local.set({ hideShortcutsTip: true })
@@ -28,46 +44,27 @@ function App() {
   }, [])
 
   return (
+    (isChrome && !hideShortcutsTipQuery.isLoading && !hideShortcutsTipQuery.data && (
+      <p className="m-0 mb-2">
+        提示:{' '}
+        <a onClick={openShortcutsPage} className="underline cursor-pointer">
+          设置快捷键
+        </a>{' '}
+        快速唤起该窗口.
+      </p>
+    )) ||
+    null
+  )
+}
+
+function App() {
+  const aiProvider = useAiProvider()
+
+  return (
     <div className="flex flex-col h-full">
-      <div className="mb-2 flex flex-row items-center px-1">
-        <img src={logo} className="w-5 h-5 rounded-sm" />
-        <p className="text-sm font-semibold m-0 ml-1">AiKit</p>
-        <div className="grow"></div>
-        <span className="cursor-pointer leading-[0]" onClick={openOptionsPage}>
-          <GearIcon size={16} />
-        </span>
-      </div>
-      {isChrome && !hideShortcutsTipQuery.isLoading && !hideShortcutsTipQuery.data && (
-        <p className="m-0 mb-2">
-          Tip:{' '}
-          <a onClick={openShortcutsPage} className="underline cursor-pointer">
-            setup shortcuts
-          </a>{' '}
-          for faster access.
-        </p>
-      )}
-      {(() => {
-        if (accessTokenQuery.isLoading) {
-          return (
-            <div className="grow justify-center items-center flex animate-bounce">
-              <GlobeIcon size={24} />
-            </div>
-          )
-        }
-        if (accessTokenQuery.data) {
-          return <iframe src="https://chat.openai.com" className="grow border-none" />
-        }
-        return (
-          <div className="grow flex flex-col justify-center">
-            <p className="text-base px-2 text-center">
-              Please login and pass Cloudflare check at{' '}
-              <a href="https://chat.openai.com" target="_blank" rel="noreferrer">
-                chat.openai.com
-              </a>
-            </p>
-          </div>
-        )
-      })()}
+      <PopupHeader />
+      <ShortCutsTip />
+      {aiProvider?.provider === ProviderType.ChatGPT ? <ChatGPTWebFrame /> : <DialogBox />}
     </div>
   )
 }
