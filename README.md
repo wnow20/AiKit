@@ -9,8 +9,9 @@ AiKit - AI工具箱
 - [x] options 改造及中文化
 - [x] ChatGPT 错误提示
 - [x] re-generate
+- [ ] popup
+- [ ] aikit provider 
 - 弹框出现位置
-- popup
 - 更换LOGO
 - 对话框支持代码高亮、复制
 - 一键切换为AiKit官方接口

@@ -57,7 +57,7 @@ function ShortCutsTip() {
   )
 }
 
-function App() {
+function Popup() {
   const aiProvider = useAiProvider()
 
   return (
@@ -69,4 +69,4 @@ function App() {
   )
 }
 
-export default App
+export default Popup
