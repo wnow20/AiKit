@@ -137,6 +137,34 @@ function DialogBox(props: DialogBoxProps) {
     [conversation],
   )
 
+  const sendRetry = React.useCallback(() => {
+    if (!conversation || conversation.qnaList.length === 0) {
+      return
+    }
+    const latestQA = conversation.qnaList[conversation.qnaList.length - 1]
+    if (!latestQA.answer.error) {
+      return
+    }
+    setConversation({
+      ...conversation,
+      qnaList: [
+        ...conversation.qnaList.slice(0, conversation.qnaList.length - 1),
+        {
+          ...latestQA,
+          answer: {
+            ...latestQA.answer,
+            error: '',
+            status: 'progressing',
+          },
+        },
+      ],
+    })
+    setRetry((r) => r + 1)
+    portRef.current?.postMessage({
+      question: latestQA.question,
+    })
+  }, [conversation])
+
   function submit(inputText: string, conversation: Conversation) {
     if (!conversation || conversation.qnaList.length === 0) {
       return
@@ -205,17 +233,13 @@ function DialogBox(props: DialogBoxProps) {
     return msgList
   }, [conversation])
 
-  const handleRegenerateClick = React.useCallback(() => {
-    // TODO
-  }, [])
-
   const height = isChat ? 450 : undefined
 
   const handleTriggerChatClick = React.useCallback(() => {
     setIsChat(true)
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       inputRef.current?.focus()
-    })
+    }, 50)
   }, [])
 
   const error = React.useMemo(() => {
@@ -230,8 +254,7 @@ function DialogBox(props: DialogBoxProps) {
   useEffect(() => {
     const onFocus = () => {
       if (error && (error == 'UNAUTHORIZED' || error === 'CLOUDFLARE')) {
-        // setError('')
-        // setRetry((r) => r + 1)
+        sendRetry()
       }
     }
     window.addEventListener('focus', onFocus)
@@ -254,7 +277,7 @@ function DialogBox(props: DialogBoxProps) {
                 <ChatGPTError error={error} retry={retry} />
               ) : null}
               {aiProvider?.provider === ProviderType.OpenAI ? (
-                <button className="regenerate-btn" onClick={handleRegenerateClick}>
+                <button className="regenerate-btn" onClick={sendRetry}>
                   <span className="btn-icon">
                     <RefreshIcon />
                   </span>
