@@ -83,7 +83,7 @@ function initializeSelectionKit() {
       if (!selectedContent) {
         return
       }
-      const position = { x: e.clientX - 45, y: e.clientY - 45 }
+      const position = { x: e.clientX - 60, y: e.clientY - 55 }
       const element = createContainer(position)
       element.classList.add('aikit-container')
       document.documentElement.appendChild(element)
