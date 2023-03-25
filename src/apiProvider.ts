@@ -14,9 +14,7 @@ export default async function apiProvider(): Promise<Provider> {
     const { apiKey, model } = providerConfigs.configs[ProviderType.OpenAI]!
     return new OpenAIProvider(apiKey, model)
   } else if (providerConfigs.provider === ProviderType.AiKit) {
-    const apiKey = window.atob(
-      'c2stbm5Qb3dQMHR4dHRUODhmZWxUbUFUM0JsYmtGSjZNcjdSZVBrTHE3eE1hYmNHRUhs',
-    )
+    const apiKey = atob('c2stbm5Qb3dQMHR4dHRUODhmZWxUbUFUM0JsYmtGSjZNcjdSZVBrTHE3eE1hYmNHRUhs')
     return new AiKitProvider(apiKey, 'text-davinci-003')
   } else {
     throw new Error(`Unknown provider ${providerConfigs.provider}`)
