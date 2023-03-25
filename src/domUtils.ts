@@ -5,7 +5,6 @@ export function isApproachBottom(ref: HTMLElement, gap: number) {
 
 export function scrollToBottom(ref: HTMLElement) {
   const targetScrollTop = ref.scrollHeight - ref.clientHeight
-  console.log('scrollToBottom', targetScrollTop)
   ref.scroll({
     behavior: 'smooth',
     top: targetScrollTop,

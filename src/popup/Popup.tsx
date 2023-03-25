@@ -8,6 +8,7 @@ import { ProviderType } from '../config'
 import logo from '../logo.png'
 import useAiProvider from '../utils/useProvider'
 import ChatGPTWebFrame from './ChatGPTWebFrame'
+import './Popup.scss'
 
 const isChrome = /chrome/i.test(navigator.userAgent)
 

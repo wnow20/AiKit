@@ -91,15 +91,18 @@ function DialogBox(props: DialogBoxProps) {
           },
         ],
       })
+    } else {
+      setConversation({
+        id: uuidv4(),
+        qnaList: [],
+      })
     }
   }, [question])
 
   React.useEffect(() => {
-    if (!question) {
-      return
-    }
     const port = Browser.runtime.connect()
     portRef.current = port
+    console.debug('browser port connected.', port)
     const listener = (msg: AiEvent) => {
       console.log('received answer', msg)
       setConversation((prev) => {
@@ -107,11 +110,14 @@ function DialogBox(props: DialogBoxProps) {
       })
     }
     port.onMessage.addListener(listener)
-    console.log('postMessage', question)
-    port.postMessage({ question })
+    if (question) {
+      console.log('postMessage', question)
+      port.postMessage({ question })
+    }
     return () => {
       port.onMessage.removeListener(listener)
       port.disconnect()
+      console.debug('browser port disconnected')
     }
   }, [question])
 
@@ -165,28 +171,38 @@ function DialogBox(props: DialogBoxProps) {
     })
   }, [conversation])
 
-  function submit(inputText: string, conversation: Conversation) {
-    if (!conversation || conversation.qnaList.length === 0) {
+  function submit(inputText: string, conversation: Conversation | null) {
+    if (!conversation) {
       return
     }
-    const progressing = conversation.qnaList.find((x) => {
-      return x.answer.status === 'progressing'
-    })
-    if (progressing) {
-      return
-    }
-
     const qnA = newQnA(inputText)
-    setConversation((prevState): Conversation => {
-      return {
-        id: prevState?.id ?? uuidv4(),
-        qnaList: [...(prevState?.qnaList ?? []), qnA],
+    if (conversation.qnaList.length === 0) {
+      setConversation({
+        ...conversation,
+        qnaList: [qnA],
+      })
+    } else {
+      const progressing = conversation.qnaList.find((x) => {
+        return x.answer.status === 'progressing'
+      })
+      if (progressing) {
+        return
       }
-    })
+
+      setConversation((prevState): Conversation => {
+        return {
+          id: prevState?.id ?? uuidv4(),
+          qnaList: [...(prevState?.qnaList ?? []), qnA],
+        }
+      })
+    }
     setTimeout(() => {
       scrollRef.current && scrollToBottom(scrollRef.current)
     }, 100)
     setTimeout(() => {
+      if (!portRef.current) {
+        console.error('extension port not existed.')
+      }
       portRef.current?.postMessage({
         question: qnA.question,
       })
@@ -261,7 +277,7 @@ function DialogBox(props: DialogBoxProps) {
     return () => {
       window.removeEventListener('focus', onFocus)
     }
-  }, [error])
+  }, [error, sendRetry])
 
   return (
     <Draggable handle=".dialog-header">
