@@ -1,9 +1,10 @@
 import { fetchSSE } from '../fetch-sse'
 import { GenerateAnswerParams, Provider } from '../types'
 
-const API_HOST = 'https://api.openai.com'
+const API_HOST =
+  'http://nginx.web-framework-p8cg.1109595215468882.cn-hongkong.fc.devsapp.net/openai'
 
-export class OpenAIProvider implements Provider {
+export class AiKitProvider implements Provider {
   constructor(private token: string, private model: string) {
     this.token = token
     this.model = model
