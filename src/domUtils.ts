@@ -1,5 +1,5 @@
 export function isApproachBottom(ref: HTMLElement, gap: number) {
-  console.log('isApproachBottom', ref.scrollHeight - ref.clientHeight - ref.scrollTop < gap)
+  console.debug('isApproachBottom', ref.scrollHeight - ref.clientHeight - ref.scrollTop < gap)
   return ref.scrollHeight - ref.clientHeight - ref.scrollTop < gap
 }
 

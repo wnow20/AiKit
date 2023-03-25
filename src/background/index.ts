@@ -27,7 +27,7 @@ async function generateAnswers(port: Browser.Runtime.Port, question: string | Qu
     prompt,
     signal: controller.signal,
     onEvent(event) {
-      console.log('onEvent', event)
+      console.debug('onEvent', event)
       if (event.event === 'done') {
         const event: AiEvent = {
           event: 'done',
@@ -92,5 +92,5 @@ Browser.runtime.onInstalled.addListener((details) => {
 })
 
 Browser.commands.onCommand.addListener((command) => {
-  console.log(`Command: ${command}`)
+  console.debug(`Command: ${command}`)
 })

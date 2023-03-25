@@ -63,7 +63,7 @@ function createContainer(position: { x: number; y: number }) {
 }
 
 function initializeSelectionKit() {
-  console.log('initializeSelectionKit')
+  console.debug('initializeSelectionKit')
   document.addEventListener('mouseup', (e) => {
     if (aikitContentContainer && aikitContentContainer.contains(e.target as Node)) {
       return

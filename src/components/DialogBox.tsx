@@ -104,14 +104,14 @@ function DialogBox(props: DialogBoxProps) {
     portRef.current = port
     console.debug('browser port connected.', port)
     const listener = (msg: AiEvent) => {
-      console.log('received answer', msg)
+      console.debug('received answer', msg)
       setConversation((prev) => {
         return updateByAiEvent(prev, msg)
       })
     }
     port.onMessage.addListener(listener)
     if (question) {
-      console.log('postMessage', question)
+      console.debug('postMessage', question)
       port.postMessage({ question })
     }
     return () => {
