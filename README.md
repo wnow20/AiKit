@@ -11,13 +11,15 @@ AiKit - AI工具箱
 - [x] re-generate
 - [x] popup
 - [x] aikit provider 
-- 弹框出现位置
-- 更换LOGO
+- [x] 弹框出现位置
+- [x] 更换LOGO
+- 一键切换为AiKit官方接口
 - 对话框支持代码高亮、复制
 - [ ] 支持gpt3.5 ChatCompletion
-- 一键切换为AiKit官方接口
 - 上下文chat
 - 鼠标右键：翻译、summary、支持配置
+- [ ] 上架
+- [ ] 分发
 - 多语言
     - Ask ChatGPT for this query 这里可能需要动态的，目前应该是
 - [ ] 非中国区支持ChatGPT
