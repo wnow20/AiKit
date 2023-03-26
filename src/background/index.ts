@@ -82,6 +82,8 @@ Browser.runtime.onMessage.addListener(async (message) => {
     Browser.runtime.openOptionsPage()
   } else if (message.type === 'GET_ACCESS_TOKEN') {
     return getChatGPTAccessToken()
+  } else if (message.type === 'ONCLICK_SWITCH_TO_AIKIT') {
+    // TODO
   }
 })
 

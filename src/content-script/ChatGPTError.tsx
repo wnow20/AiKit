@@ -1,4 +1,5 @@
 import React from 'react'
+import Browser from 'webextension-polyfill'
 import { isBraveBrowser } from './utils'
 
 interface ChatGPTErrorProps {
@@ -10,10 +11,10 @@ function ChatGPTError(props: ChatGPTErrorProps) {
   const { error, retry } = props
 
   const handleOptionLinkClick = React.useCallback(() => {
-    // TODO
+    Browser.runtime.sendMessage({ type: 'OPEN_OPTIONS_PAGE' })
   }, [])
   const handleSwitchToAiKit = React.useCallback(() => {
-    // TODO
+    Browser.runtime.sendMessage({ type: 'ONCLICK_SWITCH_TO_AIKIT' })
   }, [])
 
   if (error === 'UNAUTHORIZED' || error === 'CLOUDFLARE') {
