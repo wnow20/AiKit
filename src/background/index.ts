@@ -1,6 +1,6 @@
 import Browser from 'webextension-polyfill'
 import apiProvider from '../apiProvider'
-import { getUserConfig } from '../config'
+import { getProviderConfigs, getUserConfig, ProviderType, saveProviderConfigs } from '../config'
 import convert2Prompt from '../promptConverter'
 import { getChatGPTAccessToken, sendMessageFeedback } from './providers/chatgpt'
 import type { AiEvent, Question } from './types'
@@ -83,7 +83,8 @@ Browser.runtime.onMessage.addListener(async (message) => {
   } else if (message.type === 'GET_ACCESS_TOKEN') {
     return getChatGPTAccessToken()
   } else if (message.type === 'ONCLICK_SWITCH_TO_AIKIT') {
-    // TODO
+    const providerConfigs = await getProviderConfigs()
+    await saveProviderConfigs(ProviderType.AiKit, providerConfigs.configs)
   }
 })
 

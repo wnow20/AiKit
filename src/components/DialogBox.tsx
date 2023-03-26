@@ -323,6 +323,7 @@ function DialogBox(props: DialogBoxProps) {
               onKeyDownCapture={handleKeyDown}
               onChange={handleInputChange}
               style={{ maxHeight: '120px', height: `${inputHeight}px` }}
+              autoFocus={true}
             ></textarea>
             <a role="button" className="send" onClick={handleSendClick}>
               <SendIcon />

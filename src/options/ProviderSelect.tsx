@@ -27,7 +27,7 @@ const ConfigPanel: FC<ConfigProps> = ({ config, models }) => {
         return
       }
       if (!model || !models.includes(model)) {
-        alert('Please select a valid model')
+        alert('请选择模型')
         return
       }
     }

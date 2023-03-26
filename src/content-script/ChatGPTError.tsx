@@ -10,11 +10,14 @@ interface ChatGPTErrorProps {
 function ChatGPTError(props: ChatGPTErrorProps) {
   const { error, retry } = props
 
-  const handleOptionLinkClick = React.useCallback(() => {
+  const handleOptionLinkClick = React.useCallback((e) => {
+    e.preventDefault()
     Browser.runtime.sendMessage({ type: 'OPEN_OPTIONS_PAGE' })
   }, [])
-  const handleSwitchToAiKit = React.useCallback(() => {
+  const handleSwitchToAiKit = React.useCallback((e) => {
+    e.preventDefault()
     Browser.runtime.sendMessage({ type: 'ONCLICK_SWITCH_TO_AIKIT' })
+    alert('完成切换')
   }, [])
 
   if (error === 'UNAUTHORIZED' || error === 'CLOUDFLARE') {
@@ -39,9 +42,13 @@ function ChatGPTError(props: ChatGPTErrorProps) {
               return (
                 <span className="italic block mt-2 text-xs">
                   ChatGPT(OpenAI)需要每隔一段时间通过一次安全检查。 如果还是访问不了，还可以在
-                  <a onClick={handleOptionLinkClick}>设置</a>
+                  <a href="#" onClick={handleOptionLinkClick}>
+                    设置
+                  </a>
                   里修改AI接口服务商为AiKit官方接口。
-                  <a onClick={handleSwitchToAiKit}>一键切换</a>
+                  <a href="#" onClick={handleSwitchToAiKit}>
+                    一键切换
+                  </a>
                 </span>
               )
             }
