@@ -10,7 +10,7 @@ import { getPossibleElementByQuerySelector } from './utils'
 
 async function mount(question: string, siteConfig: SearchEngine) {
   const container = document.createElement('div')
-  container.className = 'chat-gpt-container'
+  container.className = 'aikit-search-container'
 
   const userConfig = await getUserConfig()
   let theme: Theme

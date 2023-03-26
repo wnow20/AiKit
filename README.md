@@ -13,6 +13,8 @@ AiKit - AI工具箱
 - [x] aikit provider 
 - [x] 弹框出现位置
 - [x] 更换LOGO
+- chore
+  - [x] 设置AiKit为默认的provider
 - 一键切换为AiKit官方接口
 - 对话框支持代码高亮、复制
 - [ ] 支持gpt3.5 ChatCompletion

@@ -80,6 +80,19 @@ export interface ProviderConfigs {
   }
 }
 
+export const Provider_TEXT = {
+  [ProviderType.ChatGPT]: 'ChatGPT',
+  [ProviderType.AiKit]: 'AiKit',
+  [ProviderType.OpenAI]: 'OpenAI',
+}
+
+export function getProviderName(type: ProviderType | undefined) {
+  if (!type) {
+    return ''
+  }
+  return Provider_TEXT[type]
+}
+
 export async function getProviderConfigs(): Promise<ProviderConfigs> {
   const { provider = ProviderType.AiKit } = await Browser.storage.local.get('provider')
   const configKey = `provider:${ProviderType.OpenAI}`

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import useSWRImmutable from 'swr/immutable'
 import { fetchPromotion } from '../api'
 import { TriggerMode } from '../config'
-import ChatGPTCard from './ChatGPTCard'
+import ChatCard from './ChatCard'
 import { QueryStatus } from './ChatGPTQuery'
 import Promotion from './Promotion'
 
@@ -21,7 +21,7 @@ function ChatGPTContainer(props: Props) {
   return (
     <>
       <div className="chat-gpt-card">
-        <ChatGPTCard
+        <ChatCard
           question={props.question}
           triggerMode={props.triggerMode}
           onStatusChange={setQueryStatus}

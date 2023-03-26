@@ -1,6 +1,7 @@
 import { LightBulbIcon, SearchIcon } from '@primer/octicons-react'
 import { useState } from 'preact/hooks'
-import { TriggerMode } from '../config'
+import { getProviderName, TriggerMode } from '../config'
+import useAiProvider from '../utils/useProvider'
 import ChatGPTQuery, { QueryStatus } from './ChatGPTQuery'
 import { endsWithQuestionMark } from './utils.js'
 
@@ -10,8 +11,10 @@ interface Props {
   onStatusChange?: (status: QueryStatus) => void
 }
 
-function ChatGPTCard(props: Props) {
+function ChatCard(props: Props) {
   const [triggered, setTriggered] = useState(false)
+  const aiProvider = useAiProvider()
+  const providerName = getProviderName(aiProvider?.provider)
 
   if (props.triggerMode === TriggerMode.Always) {
     return <ChatGPTQuery question={props.question} onStatusChange={props.onStatusChange} />
@@ -22,7 +25,8 @@ function ChatGPTCard(props: Props) {
     }
     return (
       <p className="icon-and-text">
-        <LightBulbIcon size="small" /> Trigger ChatGPT by appending a question mark after your query
+        <LightBulbIcon size="small" /> Trigger {providerName} by appending a question mark after
+        your query
       </p>
     )
   }
@@ -31,9 +35,9 @@ function ChatGPTCard(props: Props) {
   }
   return (
     <p className="icon-and-text cursor-pointer" onClick={() => setTriggered(true)}>
-      <SearchIcon size="small" /> Ask ChatGPT for this query
+      <SearchIcon size="small" /> Ask {providerName} for this query
     </p>
   )
 }
 
-export default ChatGPTCard
+export default ChatCard

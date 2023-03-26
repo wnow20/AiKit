@@ -5,7 +5,11 @@ import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import Browser from 'webextension-polyfill'
 import { captureEvent } from '../analytics'
+import { AiEvent } from '../background/types'
+import CursorBlock from '../components/CursorBlock'
+import { getProviderName, ProviderType } from '../config'
 import { OldAnswer } from '../messaging'
+import useAiProvider from '../utils/useProvider'
 import ChatGPTError from './ChatGPTError'
 import ChatGPTFeedback from './ChatGPTFeedback'
 import { shouldShowRatingTip } from './utils.js'
@@ -24,6 +28,7 @@ function ChatGPTQuery(props: Props) {
   const [done, setDone] = useState(false)
   const [showTip, setShowTip] = useState(false)
   const [status, setStatus] = useState<QueryStatus>()
+  const aiProvider = useAiProvider()
 
   useEffect(() => {
     props.onStatusChange?.(status)
@@ -31,11 +36,11 @@ function ChatGPTQuery(props: Props) {
 
   useEffect(() => {
     const port = Browser.runtime.connect()
-    const listener = (msg: any) => {
-      if (msg.text) {
-        setAnswer(msg)
+    const listener = (msg: AiEvent) => {
+      if ('text' in msg.data) {
+        setAnswer(msg.data)
         setStatus('success')
-      } else if (msg.error) {
+      } else if ('error' in msg) {
         setError(msg.error)
         setStatus('error')
       } else if (msg.event === 'done') {
@@ -82,29 +87,32 @@ function ChatGPTQuery(props: Props) {
     return (
       <div className="markdown-body gpt-markdown" id="gpt-answer" dir="auto">
         <div className="gpt-header">
-          <span className="font-bold">ChatGPT</span>
+          <span className="font-bold">{getProviderName(aiProvider?.provider)}</span>
           <span className="cursor-pointer leading-[0]" onClick={openOptionsPage}>
             <GearIcon size={14} />
           </span>
-          <ChatGPTFeedback
-            messageId={answer.questionId}
-            conversationId={answer.conversationId}
-            answerText={answer.text}
-          />
+          {aiProvider?.provider === ProviderType.ChatGPT ? (
+            <ChatGPTFeedback
+              messageId={answer.questionId}
+              conversationId={answer.conversationId}
+              answerText={answer.text}
+            />
+          ) : null}
         </div>
         <ReactMarkdown rehypePlugins={[[rehypeHighlight, { detect: true }]]}>
           {answer.text}
         </ReactMarkdown>
         {done && showTip && (
           <p className="italic mt-2">
-            Enjoy this extension? Give us a 5-star rating at{' '}
+            喜欢这个插件? 给个五星好评吧~ 去{' '}
             <a
               href="https://chatgpt4google.com/chrome?utm_source=rating_tip"
               target="_blank"
               rel="noreferrer"
             >
               Chrome Web Store
-            </a>
+            </a>{' '}
+            评价
           </p>
         )}
       </div>
@@ -115,7 +123,19 @@ function ChatGPTQuery(props: Props) {
     return <ChatGPTError error={error} retry={retry} />
   }
 
-  return <p className="text-[#b6b8ba] animate-pulse">Waiting for ChatGPT response...</p>
+  return (
+    <div className="markdown-body gpt-markdown" id="gpt-answer" dir="auto">
+      <div className="gpt-header">
+        <span className="font-bold">{getProviderName(aiProvider?.provider)}</span>
+        <span className="cursor-pointer leading-[0]" onClick={openOptionsPage}>
+          <GearIcon size={14} />
+        </span>
+      </div>
+      <div>
+        <CursorBlock />
+      </div>
+    </div>
+  )
 }
 
 export default memo(ChatGPTQuery)
