@@ -302,7 +302,7 @@ function DialogBox(props: DialogBoxProps) {
               {aiProvider?.provider === ProviderType.ChatGPT ? (
                 <ChatGPTError error={error} retry={retry} />
               ) : null}
-              {aiProvider?.provider === ProviderType.OpenAI ? (
+              {aiProvider?.provider !== ProviderType.ChatGPT ? (
                 <button className="regenerate-btn" onClick={sendRetry}>
                   <span className="btn-icon">
                     <RefreshIcon />

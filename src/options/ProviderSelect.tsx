@@ -37,7 +37,7 @@ const ConfigPanel: FC<ConfigProps> = ({ config, models }) => {
         apiKey: apiKeyBindings.value,
       },
     })
-    setToast({ text: 'Changes saved', type: 'success' })
+    setToast({ text: '已修改', type: 'success' })
   }, [apiKeyBindings.value, model, models, setToast, tab])
 
   return (

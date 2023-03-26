@@ -81,7 +81,7 @@ export interface ProviderConfigs {
 }
 
 export async function getProviderConfigs(): Promise<ProviderConfigs> {
-  const { provider = ProviderType.OpenAI } = await Browser.storage.local.get('provider')
+  const { provider = ProviderType.AiKit } = await Browser.storage.local.get('provider')
   const configKey = `provider:${ProviderType.OpenAI}`
   const result = await Browser.storage.local.get(configKey)
   return {
