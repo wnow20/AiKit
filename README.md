@@ -15,6 +15,8 @@ AiKit - AI工具箱
 - [x] 更换LOGO
 - chore
   - [x] 设置AiKit为默认的provider
+- bugfixs
+  - [x] 修复因为结构的变化导致ChatCard读取msg对象的错误
 - 一键切换为AiKit官方接口
 - 对话框支持代码高亮、复制
 - [ ] 支持gpt3.5 ChatCompletion
