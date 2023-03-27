@@ -2,6 +2,7 @@ import ExpiryMap from 'expiry-map'
 import { v4 as uuidv4 } from 'uuid'
 import { fetchSSE } from '../fetch-sse'
 import { GenerateAnswerParams, Provider } from '../types'
+import { ChatCompletionParams } from './provider-types'
 
 async function request(token: string, method: string, path: string, data?: unknown) {
   return fetch(`https://chat.openai.com/backend-api${path}`, {
@@ -66,6 +67,11 @@ export class ChatGPTProvider implements Provider {
       console.error(err)
       return 'text-davinci-002-render'
     }
+  }
+
+  async chatCompletion(params: ChatCompletionParams) {
+    // TODO
+    return {}
   }
 
   async generateAnswer(params: GenerateAnswerParams) {

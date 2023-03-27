@@ -1,5 +1,7 @@
 import { fetchSSE } from '../fetch-sse'
 import { GenerateAnswerParams, Provider } from '../types'
+import { ASSISTANT_GREETING, extractMessages } from './provider-common'
+import { ChatCompletionParams, ChatCompletionResponse } from './provider-types'
 
 const API_HOST = 'https://api.openai.com'
 
@@ -14,6 +16,54 @@ export class OpenAIProvider implements Provider {
       return `Respond conversationally.<|im_end|>\n\nUser: ${prompt}<|im_sep|>\nChatGPT:`
     }
     return prompt
+  }
+
+  async chatCompletion(params: ChatCompletionParams) {
+    let result = ''
+    const messages = extractMessages(params.conversation)
+    messages.unshift({ role: 'assistant', content: ASSISTANT_GREETING })
+    await fetchSSE(API_HOST + '/v1/chat/completions', {
+      method: 'POST',
+      signal: params.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`,
+      },
+      body: JSON.stringify({
+        messages,
+        model: 'gpt-3.5-turbo-0301',
+        stream: true,
+        max_tokens: 2000,
+      }),
+      onMessage: (message) => {
+        console.debug('aikit provider receive message', message)
+        if (message === '[DONE]') {
+          params.onEvent({ event: 'done' })
+          return
+        }
+        let data: ChatCompletionResponse
+        try {
+          data = JSON.parse(message)
+          const text = data.choices[0].delta.content
+          if (text == null) {
+            return
+          }
+          result += text
+          params.onEvent({
+            event: 'answer',
+            data: {
+              text: result,
+              questionId: data.id,
+              conversationId: data.id,
+            },
+          })
+        } catch (err) {
+          console.error(err)
+          return
+        }
+      },
+    })
+    return {}
   }
 
   async generateAnswer(params: GenerateAnswerParams) {

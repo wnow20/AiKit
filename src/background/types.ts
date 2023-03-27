@@ -1,4 +1,5 @@
 import { OldAnswer } from '../messaging'
+import { ChatCompletionParams } from './providers/provider-types'
 
 export type AiEvent =
   | {
@@ -29,6 +30,7 @@ export interface GenerateAnswerParams {
 
 export interface Provider {
   generateAnswer(params: GenerateAnswerParams): Promise<{ cleanup?: () => void }>
+  chatCompletion(params: ChatCompletionParams): Promise<{ cleanup?: () => void }>
 }
 
 export type Role = 'user' | 'assistant'

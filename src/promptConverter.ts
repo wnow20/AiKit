@@ -1,4 +1,4 @@
-import type { Question } from './background/types'
+import type { Conversation, Question } from './background/types'
 import { Language } from './config'
 
 function generateTranslatePrompt(content: string, language: Language) {
@@ -28,5 +28,28 @@ export default function convertPrompt(question: Question, language: Language): s
     const type: never = question.type
     // type check
     return type
+  }
+}
+
+function decorateQuestion(question: Question, language: Language): Question {
+  return {
+    ...question,
+    text: convertPrompt(question, language),
+  }
+}
+
+export function decorateConversation(conversation: Conversation, language: Language): Conversation {
+  if (!conversation.qnaList) {
+    return conversation
+  }
+
+  return {
+    ...conversation,
+    qnaList: conversation.qnaList.map((qna) => {
+      return {
+        ...qna,
+        question: decorateQuestion(qna.question, language),
+      }
+    }),
   }
 }

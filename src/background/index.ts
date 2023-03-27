@@ -1,9 +1,10 @@
 import Browser from 'webextension-polyfill'
 import apiProvider from '../apiProvider'
 import { getProviderConfigs, getUserConfig, ProviderType, saveProviderConfigs } from '../config'
-import convert2Prompt from '../promptConverter'
+import convert2Prompt, { decorateConversation } from '../promptConverter'
+import { getLatestQnA } from '../utils/getLatestQnA'
 import { getChatGPTAccessToken, sendMessageFeedback } from './providers/chatgpt'
-import type { AiEvent, Question } from './types'
+import type { AiEvent, Conversation, Question } from './types'
 
 async function generateAnswers(port: Browser.Runtime.Port, question: string | Question) {
   const provider = await apiProvider()
@@ -56,22 +57,86 @@ async function generateAnswers(port: Browser.Runtime.Port, question: string | Qu
   })
 }
 
+async function chatCompletion(port: Browser.Runtime.Port, conversation: Conversation) {
+  const provider = await apiProvider()
+  const latestQnA = getLatestQnA(conversation)
+  if (!latestQnA) {
+    return
+  }
+  const controller = new AbortController()
+  port.onDisconnect.addListener(() => {
+    controller.abort()
+    cleanup?.()
+  })
+  let message = ''
+  const userConfig = await getUserConfig()
+  const decoratedConversation = decorateConversation(conversation, userConfig.language)
+
+  const { cleanup } = await provider.chatCompletion({
+    conversation: decoratedConversation,
+    signal: controller.signal,
+    onEvent(event) {
+      console.debug('chatCompletion onEvent', event)
+      if (event.event === 'done') {
+        const event: AiEvent = {
+          event: 'done',
+          data: {
+            text: message,
+            questionId: latestQnA.question.id,
+            conversationId: conversation.id,
+          },
+        }
+        port.postMessage(event)
+        return
+      }
+      message = event.data.text
+      const aiEvent = {
+        event: 'answer',
+        data: {
+          ...event.data,
+          questionId: latestQnA.question.id,
+          conversationId: conversation.id,
+        },
+      } as AiEvent
+      port.postMessage(aiEvent)
+    },
+  })
+}
+
 Browser.runtime.onConnect.addListener((port) => {
   console.debug('connected')
-  port.onMessage.addListener(async (msg: { question: Question }) => {
-    console.debug('received msg', msg)
-    try {
-      await generateAnswers(port, msg.question)
-    } catch (err: any) {
-      console.error(err)
-      port.postMessage({
-        error: err.message,
-        data: {
-          questionId: msg.question.id,
-        },
-      })
-    }
-  })
+  port.onMessage.addListener(
+    async (msg: { question: Question } | { conversation: Conversation }) => {
+      console.debug('received msg', msg)
+      if ('question' in msg) {
+        try {
+          await generateAnswers(port, msg.question)
+        } catch (err: any) {
+          console.error(err)
+          port.postMessage({
+            error: err.message,
+            data: {
+              questionId: msg.question.id,
+            },
+          })
+        }
+      }
+
+      if ('conversation' in msg) {
+        try {
+          await chatCompletion(port, msg.conversation)
+        } catch (err: any) {
+          console.error(err)
+          port.postMessage({
+            error: err.message,
+            data: {
+              questionId: getLatestQnA(msg.conversation)?.question.id,
+            },
+          })
+        }
+      }
+    },
+  )
 })
 
 Browser.runtime.onMessage.addListener(async (message) => {

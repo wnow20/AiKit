@@ -12,6 +12,7 @@ import OpenAIIcon from '../images/openai.svg'
 import RefreshIcon from '../images/refresh.svg'
 import SendIcon from '../images/send.svg'
 import useUpdateEffect from '../useUpdateEffect'
+import { getLatestQnA } from '../utils/getLatestQnA'
 import useAiProvider from '../utils/useProvider'
 import { updateByAiEvent } from './converse'
 import CursorBlock from './CursorBlock'
@@ -40,7 +41,9 @@ function DialogItem(props: DialogItemProps) {
         <div className="dialog-content">
           <QuestionTag type={message.qType} />
           {message.data}
-          {message.status === 'progressing' ? <CursorBlock /> : null}
+          {message.status === 'progressing' || message.status === 'not_started' ? (
+            <CursorBlock />
+          ) : null}
         </div>
       </div>
     </div>
@@ -57,7 +60,7 @@ function newQnA(text: string): QnA {
     answer: {
       id: uuidv4(),
       text: '',
-      status: 'progressing',
+      status: 'not_started',
     },
   }
 }
@@ -87,7 +90,7 @@ function DialogBox(props: DialogBoxProps) {
             answer: {
               id: uuidv4(),
               text: '',
-              status: 'progressing',
+              status: 'not_started',
             },
           },
         ],
@@ -103,7 +106,6 @@ function DialogBox(props: DialogBoxProps) {
   React.useEffect(() => {
     const port = Browser.runtime.connect()
     portRef.current = port
-    console.debug('browser port connected.', port)
     const listener = (msg: AiEvent) => {
       console.debug('received answer', msg)
       setConversation((prev) => {
@@ -111,16 +113,27 @@ function DialogBox(props: DialogBoxProps) {
       })
     }
     port.onMessage.addListener(listener)
-    if (question) {
-      console.debug('postMessage', question)
-      port.postMessage({ question })
-    }
     return () => {
       port.onMessage.removeListener(listener)
       port.disconnect()
       console.debug('browser port disconnected')
     }
-  }, [question])
+  }, [])
+
+  React.useEffect(() => {
+    const port = portRef.current
+    if (!port) {
+      console.debug('browser port not exist.')
+      return
+    }
+
+    const latestQnA = getLatestQnA(conversation)
+    if (latestQnA?.answer.status === 'not_started') {
+      port.postMessage({
+        conversation,
+      })
+    }
+  }, [conversation])
 
   const handleInputChange = React.useCallback((e) => {
     setText(() => {
@@ -145,11 +158,8 @@ function DialogBox(props: DialogBoxProps) {
   )
 
   const sendRetry = React.useCallback(() => {
-    if (!conversation || conversation.qnaList.length === 0) {
-      return
-    }
-    const latestQA = conversation.qnaList[conversation.qnaList.length - 1]
-    if (!latestQA.answer.error) {
+    const latestQA = getLatestQnA(conversation)
+    if (!conversation || !latestQA || !latestQA.answer.error) {
       return
     }
     setConversation({
@@ -161,15 +171,12 @@ function DialogBox(props: DialogBoxProps) {
           answer: {
             ...latestQA.answer,
             error: '',
-            status: 'progressing',
+            status: 'not_started',
           },
         },
       ],
     })
     setRetry((r) => r + 1)
-    portRef.current?.postMessage({
-      question: latestQA.question,
-    })
   }, [conversation])
 
   function submit(inputText: string, conversation: Conversation | null) {
@@ -200,14 +207,6 @@ function DialogBox(props: DialogBoxProps) {
     setTimeout(() => {
       scrollRef.current && scrollToBottom(scrollRef.current)
     }, 100)
-    setTimeout(() => {
-      if (!portRef.current) {
-        console.error('extension port not existed.')
-      }
-      portRef.current?.postMessage({
-        question: qnA.question,
-      })
-    })
     setText('')
   }
 
