@@ -24,7 +24,8 @@ AiKit - AI工具箱
     - [x] 修复多个aikitContainer导致的子元素重复问题
 - [ ] 支持gpt3.5 ChatCompletion & 上下文chat
 - [ ] 对话框支持代码高亮、复制
-- [ ] 分发
+- [ ] 编辑yuque文档 
+- [ ] 分发：知乎帖子
 - [ ] 上架
 - 鼠标右键：翻译、summary、支持配置
 - 多语言
