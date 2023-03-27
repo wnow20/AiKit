@@ -14,8 +14,6 @@ const isChrome = /chrome/i.test(navigator.userAgent)
 
 const SHORTCUTS_TIP_KEY = 'hideShortcutsTip'
 
-// Browser.storage.local.remove(SHORTCUTS_TIP_KEY)
-
 function PopupHeader() {
   const openOptionsPage = useCallback(() => {
     Browser.runtime.sendMessage({ type: 'OPEN_OPTIONS_PAGE' })
@@ -65,7 +63,11 @@ function Popup() {
     <div className="flex flex-col h-full">
       <PopupHeader />
       <ShortCutsTip />
-      {aiProvider?.provider === ProviderType.ChatGPT ? <ChatGPTWebFrame /> : <DialogBox />}
+      {aiProvider?.provider === ProviderType.ChatGPT ? (
+        <ChatGPTWebFrame />
+      ) : (
+        <DialogBox persistent={true} />
+      )}
     </div>
   )
 }

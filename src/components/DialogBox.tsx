@@ -4,7 +4,7 @@ import Draggable, { ControlPosition, DraggableData, DraggableEvent } from 'react
 import { v4 as uuidv4 } from 'uuid'
 import Browser, { Runtime } from 'webextension-polyfill'
 import type { AiEvent, Conversation, Message, QnA, Question } from '../background/types'
-import { ProviderType } from '../config'
+import { getHistoryChat, ProviderType } from '../config'
 import ChatGPTError from '../content-script/ChatGPTError'
 import { elementBoundCheck, scrollToBottom } from '../domUtils'
 import AvatarIcon from '../images/avatar.svg'
@@ -13,6 +13,8 @@ import RefreshIcon from '../images/refresh.svg'
 import SendIcon from '../images/send.svg'
 import useUpdateEffect from '../useUpdateEffect'
 import { getLatestQnA } from '../utils/getLatestQnA'
+import { getInitChat } from '../utils/initChat'
+import { isHistoryChatValid } from '../utils/isHistoryChatValid'
 import useAiProvider from '../utils/useProvider'
 import { updateByAiEvent } from './converse'
 import CursorBlock from './CursorBlock'
@@ -21,6 +23,7 @@ import QuestionTag from './QuestionTag'
 
 interface DialogBoxProps {
   question?: Question
+  persistent?: boolean
 }
 
 interface DialogItemProps {
@@ -66,7 +69,7 @@ function newQnA(text: string): QnA {
 }
 
 function DialogBox(props: DialogBoxProps) {
-  const { question } = props
+  const { question, persistent } = props
   const [conversation, setConversation] = React.useState<Conversation>()
   const portRef = React.useRef<Runtime.Port>()
   const inputRef = React.useRef<HTMLTextAreaElement>(null)
@@ -96,12 +99,23 @@ function DialogBox(props: DialogBoxProps) {
         ],
       })
     } else {
-      setConversation({
-        id: uuidv4(),
-        qnaList: [],
-      })
+      if (persistent) {
+        getHistoryChat()
+          .then((msg) => {
+            console.debug('historyChat loaded.', msg.chat)
+            return isHistoryChatValid(msg.chat) ? msg.chat : getInitChat()
+          })
+          .catch(() => {
+            return getInitChat()
+          })
+          .then((historyChat) => {
+            setConversation(historyChat)
+          })
+      } else {
+        setConversation(getInitChat())
+      }
     }
-  }, [question])
+  }, [persistent, question])
 
   React.useEffect(() => {
     const port = Browser.runtime.connect()
@@ -121,6 +135,17 @@ function DialogBox(props: DialogBoxProps) {
   }, [])
 
   React.useEffect(() => {
+    const latestQnA = getLatestQnA(conversation)
+    if (persistent && latestQnA && latestQnA.answer.status === 'succeed') {
+      console.debug('PERSIST_CHAT event sent')
+      Browser.runtime.sendMessage({
+        type: 'PERSIST_CHAT',
+        chat: conversation,
+      })
+    }
+  }, [conversation, persistent])
+
+  React.useEffect(() => {
     const port = portRef.current
     if (!port) {
       console.debug('browser port not exist.')
@@ -131,9 +156,10 @@ function DialogBox(props: DialogBoxProps) {
     if (latestQnA?.answer.status === 'not_started') {
       port.postMessage({
         conversation,
+        persistent,
       })
     }
-  }, [conversation])
+  }, [conversation, persistent])
 
   const handleInputChange = React.useCallback((e) => {
     setText(() => {

@@ -140,6 +140,7 @@ Browser.runtime.onConnect.addListener((port) => {
 })
 
 Browser.runtime.onMessage.addListener(async (message) => {
+  console.debug('receive one-by-one message', message)
   if (message.type === 'FEEDBACK') {
     const token = await getChatGPTAccessToken()
     await sendMessageFeedback(token, message.data)
@@ -150,6 +151,13 @@ Browser.runtime.onMessage.addListener(async (message) => {
   } else if (message.type === 'ONCLICK_SWITCH_TO_AIKIT') {
     const providerConfigs = await getProviderConfigs()
     await saveProviderConfigs(ProviderType.AiKit, providerConfigs.configs)
+  } else if (message.type === 'PERSIST_CHAT') {
+    await Browser.storage.local.set({
+      chat: message.chat,
+    })
+    Browser.storage.local.get('chat').then((chat) => {
+      console.debug('Saved chat', chat)
+    })
   }
 })
 

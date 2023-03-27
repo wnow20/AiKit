@@ -1,5 +1,6 @@
 import { defaults } from 'lodash-es'
 import Browser from 'webextension-polyfill'
+import { Conversation } from './background/types'
 
 export enum TriggerMode {
   Always = 'always',
@@ -103,6 +104,10 @@ export async function getProviderConfigs(): Promise<ProviderConfigs> {
       [ProviderType.OpenAI]: result[configKey],
     },
   }
+}
+
+export async function getHistoryChat(): Promise<{ chat: Conversation }> {
+  return (await Browser.storage.local.get('chat')) as { chat: Conversation }
 }
 
 export async function saveProviderConfigs(
