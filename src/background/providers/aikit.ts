@@ -34,7 +34,7 @@ export class AiKitProvider implements Provider {
         messages,
         model: 'gpt-3.5-turbo-0301',
         stream: true,
-        max_tokens: 2000,
+        max_tokens: 5000,
       }),
       onMessage: (message) => {
         console.debug('aikit provider receive message', message)
