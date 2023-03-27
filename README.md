@@ -1,7 +1,9 @@
 # AiKit
+
 AiKit - AI工具箱
 
 ### TODOs
+
 - [x] CMD+K 唤起智能框，类似Spotlight
 - [x] 对话框，有新增消息是自动滚动到最后
 - [x] Chat
@@ -10,15 +12,16 @@ AiKit - AI工具箱
 - [x] ChatGPT 错误提示
 - [x] re-generate
 - [x] popup
-- [x] aikit provider 
+- [x] aikit provider
 - [x] 弹框出现位置
 - [x] 更换LOGO
-- [x]一键切换为AiKit官方接口
+  - [x]一键切换为AiKit官方接口
 - chore
-  - [x] 设置AiKit为默认的provider
+    - [x] 设置AiKit为默认的provider
 - bugfixs
-  - [x] 修复因为结构的变化导致ChatCard读取msg对象的错误
-  - [x] 修复因为box-sizing未设置到只的样式问题
+    - [x] 修复因为结构的变化导致ChatCard读取msg对象的错误
+    - [x] 修复因为box-sizing未设置到只的样式问题
+    - [x] 修复多个aikitContainer导致的子元素重复问题
 - 对话框支持代码高亮、复制
 - [ ] 支持gpt3.5 ChatCompletion
 - 上下文chat

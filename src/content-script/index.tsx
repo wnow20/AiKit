@@ -59,7 +59,18 @@ function createContainer(position: { x: number; y: number }) {
   element.style.zIndex = '99999'
   element.style.left = position.x + 'px'
   element.style.top = position.y + 'px'
+  element.classList.add('aikit-container')
+  document.documentElement.appendChild(element)
   return element
+}
+
+function getContainer(e: MouseEvent) {
+  const position = { x: e.clientX - 60, y: e.clientY - 55 }
+  if (aikitContentContainer) {
+    aikitContentContainer.style.left = position.x + 'px'
+    aikitContentContainer.style.top = position.y + 'px'
+  }
+  return aikitContentContainer || createContainer(position)
 }
 
 function initializeSelectionKit() {
@@ -83,11 +94,7 @@ function initializeSelectionKit() {
       if (!selectedContent) {
         return
       }
-      const position = { x: e.clientX - 60, y: e.clientY - 55 }
-      const element = createContainer(position)
-      element.classList.add('aikit-container')
-      document.documentElement.appendChild(element)
-      aikitContentContainer = element
+      aikitContentContainer = getContainer(e)
 
       render(<FloatingKit selection={selectedContent} />, aikitContentContainer)
     })
