@@ -130,6 +130,7 @@ function DialogBox(props: DialogBoxProps) {
     return () => {
       port.onMessage.removeListener(listener)
       port.disconnect()
+      portRef.current = undefined
       console.debug('browser port disconnected')
     }
   }, [])
@@ -154,10 +155,26 @@ function DialogBox(props: DialogBoxProps) {
 
     const latestQnA = getLatestQnA(conversation)
     if (latestQnA?.answer.status === 'not_started') {
-      port.postMessage({
-        conversation,
-        persistent,
-      })
+      try {
+        port.postMessage({
+          conversation,
+          persistent,
+        })
+      } catch (e) {
+        const err = e as Error
+        if ('message' in err && err.message.includes('Extension context invalidated')) {
+          setConversation((prev) => {
+            const errorMsg: AiEvent = {
+              error: '插件已更新，请刷新网页或重开窗口',
+              data: {
+                questionId: latestQnA.question.id,
+              },
+            }
+            return updateByAiEvent(prev, errorMsg)
+          })
+        }
+        console.error(e)
+      }
     }
   }, [conversation, persistent])
 
@@ -328,12 +345,15 @@ function DialogBox(props: DialogBoxProps) {
                 <ChatGPTError error={error} retry={retry} />
               ) : null}
               {aiProvider?.provider !== ProviderType.ChatGPT ? (
-                <button className="regenerate-btn" onClick={sendRetry}>
-                  <span className="btn-icon">
-                    <RefreshIcon />
-                  </span>
-                  &nbsp;重新生成
-                </button>
+                <div>
+                  <p>{error}</p>
+                  <button className="regenerate-btn" onClick={sendRetry}>
+                    <span className="btn-icon">
+                      <RefreshIcon />
+                    </span>
+                    &nbsp;重新生成
+                  </button>
+                </div>
               ) : null}
             </div>
           ) : null}

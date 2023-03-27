@@ -59,7 +59,7 @@ function ChatGPTError(props: ChatGPTErrorProps) {
   if (error) {
     return (
       <p>
-        Failed to load response from ChatGPT:
+        访问失败:
         <span className="break-all block">{error}</span>
       </p>
     )
