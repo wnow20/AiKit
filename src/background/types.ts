@@ -68,4 +68,5 @@ export interface QnA {
 export interface Conversation {
   id: string
   qnaList: QnA[]
+  createAt: number
 }

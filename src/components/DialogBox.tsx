@@ -4,7 +4,7 @@ import Draggable, { ControlPosition, DraggableData, DraggableEvent } from 'react
 import { v4 as uuidv4 } from 'uuid'
 import Browser, { Runtime } from 'webextension-polyfill'
 import type { AiEvent, Conversation, Message, QnA, Question } from '../background/types'
-import { getHistoryChat, ProviderType } from '../config'
+import { ProviderType } from '../config'
 import ChatGPTError from '../content-script/ChatGPTError'
 import { elementBoundCheck, scrollToBottom } from '../domUtils'
 import AvatarIcon from '../images/avatar.svg'
@@ -13,8 +13,7 @@ import RefreshIcon from '../images/refresh.svg'
 import SendIcon from '../images/send.svg'
 import useUpdateEffect from '../useUpdateEffect'
 import { getLatestQnA } from '../utils/getLatestQnA'
-import { getInitChat } from '../utils/initChat'
-import { isHistoryChatValid } from '../utils/isHistoryChatValid'
+import { buildChat } from '../utils/initChat'
 import useAiProvider from '../utils/useProvider'
 import { updateByAiEvent } from './converse'
 import CursorBlock from './CursorBlock'
@@ -84,37 +83,9 @@ function DialogBox(props: DialogBoxProps) {
   const dialogBoxRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
-    if (question) {
-      setConversation({
-        id: uuidv4(),
-        qnaList: [
-          {
-            question,
-            answer: {
-              id: uuidv4(),
-              text: '',
-              status: 'not_started',
-            },
-          },
-        ],
-      })
-    } else {
-      if (persistent) {
-        getHistoryChat()
-          .then((msg) => {
-            console.debug('historyChat loaded.', msg.chat)
-            return isHistoryChatValid(msg.chat) ? msg.chat : getInitChat()
-          })
-          .catch(() => {
-            return getInitChat()
-          })
-          .then((historyChat) => {
-            setConversation(historyChat)
-          })
-      } else {
-        setConversation(getInitChat())
-      }
-    }
+    buildChat(question, persistent).then((chat) => {
+      setConversation(chat)
+    })
   }, [persistent, question])
 
   React.useEffect(() => {
@@ -292,8 +263,6 @@ function DialogBox(props: DialogBoxProps) {
     return msgList
   }, [conversation])
 
-  const height = isChat ? 450 : undefined
-
   const handleTriggerChatClick = React.useCallback(() => {
     setIsChat(true)
     setTimeout(() => {
@@ -333,7 +302,7 @@ function DialogBox(props: DialogBoxProps) {
   }, [])
   return (
     <Draggable handle=".dialog-header" position={position} onStop={handDragStop}>
-      <div className="aikit-dialog-box" ref={dialogBoxRef} style={{ width: 400, height }}>
+      <div className="aikit-dialog-box" ref={dialogBoxRef} style={{ width: 400, maxHeight: 450 }}>
         <div className="dialog-header"></div>
         <div className="dialog-list" ref={scrollRef}>
           {messages.map((message, index) => (

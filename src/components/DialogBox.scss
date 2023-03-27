@@ -14,6 +14,7 @@
 
   .dialog-header {
     height: 20px;
+    min-height: 20px;
     cursor: move;
   }
 
@@ -21,7 +22,7 @@
   .dialog-list {
     display: flex;
     flex-direction: column;
-    flex: 1 0;
+    flex: 1;
     overflow-y: scroll;
     overflow-x: hidden;
     line-height: 1.5em;
