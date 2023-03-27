@@ -4,6 +4,11 @@
     background: none;
     width: 100% !important;
     height: 100vh !important;
+    max-height: none !important;
+  }
+
+  .aikit-dialog-box .dialog-header {
+    display: none;
   }
 
   * {

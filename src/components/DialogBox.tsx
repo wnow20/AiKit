@@ -13,7 +13,7 @@ import RefreshIcon from '../images/refresh.svg'
 import SendIcon from '../images/send.svg'
 import useUpdateEffect from '../useUpdateEffect'
 import { getLatestQnA } from '../utils/getLatestQnA'
-import { buildChat } from '../utils/initChat'
+import { buildChat, getInitChat } from '../utils/initChat'
 import useAiProvider from '../utils/useProvider'
 import { updateByAiEvent } from './converse'
 import CursorBlock from './CursorBlock'
@@ -193,6 +193,27 @@ function DialogBox(props: DialogBoxProps) {
     setRetry((r) => r + 1)
   }, [conversation])
 
+  const handleCleanChat = React.useCallback(() => {
+    const latestQA = getLatestQnA(conversation)
+    if (!conversation || !latestQA || !latestQA.answer.error) {
+      return
+    }
+    setConversation({
+      ...conversation,
+      qnaList: [
+        {
+          ...latestQA,
+          answer: {
+            ...latestQA.answer,
+            error: '',
+            status: 'not_started',
+          },
+        },
+      ],
+    })
+    setRetry((r) => r + 1)
+  }, [conversation])
+
   function submit(inputText: string, conversation: Conversation | null) {
     if (!conversation) {
       return
@@ -213,7 +234,8 @@ function DialogBox(props: DialogBoxProps) {
 
       setConversation((prevState): Conversation => {
         return {
-          id: prevState?.id ?? uuidv4(),
+          ...getInitChat(),
+          ...prevState,
           qnaList: [...(prevState?.qnaList ?? []), qnA],
         }
       })
@@ -315,7 +337,14 @@ function DialogBox(props: DialogBoxProps) {
               ) : null}
               {aiProvider?.provider !== ProviderType.ChatGPT ? (
                 <div>
-                  <p>{error}</p>
+                  <p>
+                    {error}{' '}
+                    {messages.length > 20 ? (
+                      <a href="#" className="btn-icon" onClick={handleCleanChat}>
+                        消息过多，清理历史记录
+                      </a>
+                    ) : null}
+                  </p>
                   <button className="regenerate-btn" onClick={sendRetry}>
                     <span className="btn-icon">
                       <RefreshIcon />
