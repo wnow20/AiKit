@@ -104,6 +104,14 @@
     box-sizing: border-box;
   }
 
+  a {
+    color: rgb(16, 163, 127);
+
+    &:hover {
+      color: #07523F;
+    }
+  }
+
   .selection-kit {
     white-space: nowrap;
     font-size: 1.5em;

@@ -33,9 +33,13 @@ function useBrowserAPIProbe(): APIProbe {
   const [error, setError] = React.useState<Error>()
 
   function probeAPIs() {
-    Browser.storage.local.get('provider').catch((e) => {
+    try {
+      Browser.storage.local.get('provider').catch((e) => {
+        handleException(e, setError)
+      })
+    } catch (e) {
       handleException(e, setError)
-    })
+    }
   }
 
   React.useEffect(() => {
