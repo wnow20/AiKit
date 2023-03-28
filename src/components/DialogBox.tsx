@@ -20,6 +20,7 @@ import CursorBlock from './CursorBlock'
 import './DialogBox.scss'
 import OpenAIError from './OpenAIError'
 import QuestionTag from './QuestionTag'
+import useBrowserAPIProbe from './useBrowserAPIProbe'
 
 interface DialogBoxProps {
   question?: Question
@@ -82,6 +83,7 @@ function DialogBox(props: DialogBoxProps) {
   const [retry, setRetry] = useState(0)
   const aiProvider = useAiProvider()
   const dialogBoxRef = React.useRef<HTMLDivElement>(null)
+  const { error: probeError, probeApi } = useBrowserAPIProbe()
 
   React.useEffect(() => {
     buildChat(question, persistent).then((chat) => {
@@ -90,18 +92,32 @@ function DialogBox(props: DialogBoxProps) {
   }, [persistent, question])
 
   React.useEffect(() => {
-    const port = Browser.runtime.connect()
-    portRef.current = port
+    let port: Runtime.Port
+    try {
+      port = Browser.runtime.connect()
+      portRef.current = port
+    } catch (e: any) {
+      console.error(e)
+      return
+    }
     const listener = (msg: AiEvent) => {
       console.debug('received answer', msg)
       setConversation((prev) => {
         return updateByAiEvent(prev, msg)
       })
     }
-    port.onMessage.addListener(listener)
+    try {
+      port.onMessage.addListener(listener)
+    } catch (e) {
+      console.error(e)
+    }
     return () => {
-      port.onMessage.removeListener(listener)
-      port.disconnect()
+      try {
+        port.onMessage.removeListener(listener)
+        port.disconnect()
+      } catch (e) {
+        console.error(e)
+      }
       portRef.current = undefined
       console.debug('browser port disconnected')
     }
@@ -111,10 +127,14 @@ function DialogBox(props: DialogBoxProps) {
     const latestQnA = getLatestQnA(conversation)
     if (persistent && latestQnA && latestQnA.answer.status === 'succeed') {
       console.debug('PERSIST_CHAT event sent')
-      Browser.runtime.sendMessage({
-        type: 'PERSIST_CHAT',
-        chat: conversation,
-      })
+      Browser.runtime
+        .sendMessage({
+          type: 'PERSIST_CHAT',
+          chat: conversation,
+        })
+        .catch((e) => {
+          console.error(e)
+        })
     }
   }, [conversation, persistent])
 
@@ -128,10 +148,12 @@ function DialogBox(props: DialogBoxProps) {
     const latestQnA = getLatestQnA(conversation)
     if (latestQnA?.answer.status === 'not_started') {
       try {
+        console.debug('before postMessage')
         port.postMessage({
           conversation,
           persistent,
         })
+        console.debug('after postMessage')
       } catch (e) {
         const err = e as Error
         if ('message' in err && err.message.includes('Extension context invalidated')) {
@@ -304,6 +326,7 @@ function DialogBox(props: DialogBoxProps) {
   // retry error on focus
   useEffect(() => {
     const onFocus = () => {
+      probeApi()
       if (error && (error == 'UNAUTHORIZED' || error === 'CLOUDFLARE')) {
         sendRetry()
       }
@@ -312,7 +335,7 @@ function DialogBox(props: DialogBoxProps) {
     return () => {
       window.removeEventListener('focus', onFocus)
     }
-  }, [error, sendRetry])
+  }, [error, probeApi, sendRetry])
 
   const [position, setPosition] = React.useState<ControlPosition>()
   React.useEffect(() => {
@@ -331,7 +354,7 @@ function DialogBox(props: DialogBoxProps) {
           {messages.map((message, index) => (
             <DialogItem key={index} message={message} />
           ))}
-          {error ? (
+          {error && !probeError ? (
             <div className="dialog-list-tail">
               {aiProvider?.provider === ProviderType.ChatGPT ? (
                 <ChatGPTError error={error} retry={retry} />
@@ -349,6 +372,7 @@ function DialogBox(props: DialogBoxProps) {
               ) : null}
             </div>
           ) : null}
+          {probeError ? <div className="dialog-list-tail">{probeError.message}</div> : null}
         </div>
         {isChat ? (
           <div className="message-input-wrapper">

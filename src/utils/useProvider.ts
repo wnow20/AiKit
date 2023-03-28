@@ -6,9 +6,13 @@ export default function useAiProvider() {
   const [config, setConfig] = React.useState<ProviderConfigs>()
   React.useEffect(() => {
     let cancelled = false
-    getProviderConfigs().then((pConfig) => {
-      !cancelled && setConfig(pConfig)
-    })
+    try {
+      getProviderConfigs().then((pConfig) => {
+        !cancelled && setConfig(pConfig)
+      })
+    } catch (e) {
+      console.error(e)
+    }
     const listener = async (message: any) => {
       console.debug('receive message in useAiProvider', message)
       if (message.type === 'ONCLICK_SWITCH_TO_AIKIT') {
@@ -16,10 +20,18 @@ export default function useAiProvider() {
         setConfig(providerConfigs)
       }
     }
-    Browser.runtime.onMessage.addListener(listener)
+    try {
+      Browser.runtime.onMessage.addListener(listener)
+    } catch (e) {
+      console.error(e)
+    }
     return () => {
       cancelled = true
-      Browser.runtime.onMessage.removeListener(listener)
+      try {
+        Browser.runtime.onMessage.removeListener(listener)
+      } catch (e) {
+        console.error(e)
+      }
     }
   }, [])
   return config

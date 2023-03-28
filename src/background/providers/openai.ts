@@ -33,7 +33,7 @@ export class OpenAIProvider implements Provider {
         messages,
         model: 'gpt-3.5-turbo-0301',
         stream: true,
-        max_tokens: 4000,
+        max_tokens: 3000,
       }),
       onMessage: (message) => {
         console.debug('aikit provider receive message', message)
