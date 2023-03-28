@@ -18,6 +18,7 @@ import useAiProvider from '../utils/useProvider'
 import { updateByAiEvent } from './converse'
 import CursorBlock from './CursorBlock'
 import './DialogBox.scss'
+import OpenAIError from './OpenAIError'
 import QuestionTag from './QuestionTag'
 
 interface DialogBoxProps {
@@ -337,14 +338,7 @@ function DialogBox(props: DialogBoxProps) {
               ) : null}
               {aiProvider?.provider !== ProviderType.ChatGPT ? (
                 <div>
-                  <p>
-                    {error}{' '}
-                    {messages.length > 20 ? (
-                      <a href="#" className="btn-icon" onClick={handleCleanChat}>
-                        消息过多，清理历史记录
-                      </a>
-                    ) : null}
-                  </p>
+                  <OpenAIError messages={messages} error={error} onCleanChat={handleCleanChat} />
                   <button className="regenerate-btn" onClick={sendRetry}>
                     <span className="btn-icon">
                       <RefreshIcon />
