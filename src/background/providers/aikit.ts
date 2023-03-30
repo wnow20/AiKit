@@ -6,6 +6,9 @@ import { ChatCompletionParams, ChatCompletionResponse } from './provider-types'
 const API_HOST =
   'http://nginx.web-framework-p8cg.1109595215468882.cn-hongkong.fc.devsapp.net/openai'
 
+// const API_HOST =
+//   'http://openai-proxy.openai-proxy.1109595215468882.cn-hongkong.fc.devsapp.net'
+
 export class AiKitProvider implements Provider {
   constructor(private token: string, private model: string) {
     this.token = token
