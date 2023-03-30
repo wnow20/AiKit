@@ -23,6 +23,7 @@ AiKit - AI工具箱
     - [x] 修复因为box-sizing未设置到只的样式问题
     - [x] 修复多个aikitContainer导致的子元素重复问题
     - [ ] aikit 去除 twindcss class styles
+    - [x] open ai proxy 改为nodejs代理
 - [x] 支持gpt3.5 ChatCompletion & 上下文chat
 - [x] 对话支持持久化
 - [x] 支持历史消息清理
