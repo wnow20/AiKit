@@ -22,6 +22,7 @@ AiKit - AI工具箱
     - [x] 修复因为结构的变化导致ChatCard读取msg对象的错误
     - [x] 修复因为box-sizing未设置到只的样式问题
     - [x] 修复多个aikitContainer导致的子元素重复问题
+    - [ ] aikit 去除 twindcss class styles
 - [x] 支持gpt3.5 ChatCompletion & 上下文chat
 - [x] 对话支持持久化
 - [x] 支持历史消息清理
