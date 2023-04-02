@@ -46,11 +46,7 @@ const ConfigPanel: FC<ConfigProps> = ({ config, models }) => {
         <Tabs.Item label="AiKit接口" value={ProviderType.AiKit}>
           AiKit网络服务，稳定高速，免费3个月，
           <span className="font-semibold">按量收费</span>，详见
-          <a
-            href="https://www.yuque.com/wnow20/urfk3b/hu0ox2n4xx6fwp63"
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href="https://goworks.vercel.app/aikit/pricing.html" target="_blank" rel="noreferrer">
             收费政策
           </a>
         </Tabs.Item>

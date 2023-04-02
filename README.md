@@ -18,7 +18,7 @@ AiKit - AI工具箱
 
 ## 如何安装
 ### 第一步：下载如下文件，并解压到你喜欢的路径
-下载链接见[发布日志](https://www.yuque.com/wnow20/aikit/releases-notes)
+下载链接见[发布日志](https://goworks.vercel.app/aikit/release-notes.html)
 
 ### 第二步：
 打开Chome插件管理，链接： chrome://extensions

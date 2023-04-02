@@ -33,7 +33,7 @@ function ChatGPTError(props: ChatGPTErrorProps) {
               return (
                 <span className="block mt-2">
                   还是不工作？
-                  <a href="https://www.yuque.com/wnow20/urfk3b/ul6rxvqbsy997z4y">
+                  <a href="https://goworks.vercel.app/aikit/troubleshooting.html">
                     AiKit常见问题解决办法
                   </a>
                 </span>

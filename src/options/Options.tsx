@@ -63,16 +63,20 @@ function OptionsPage(props: { theme: Theme; onThemeChange: (theme: Theme) => voi
         </div>
         <div className="flex flex-row gap-3">
           <a
-            href="https://www.yuque.com/wnow20/aikit/releases-notes"
+            href="https://goworks.vercel.app/aikit/release-notes.html"
             target="_blank"
             rel="noreferrer"
           >
             日志
           </a>
-          <a href="https://www.yuque.com/wnow20/aikit/feedbacks" target="_blank" rel="noreferrer">
+          <a href="https://github.com/wnow20/aikit/issues" target="_blank" rel="noreferrer">
             反馈
           </a>
-          <a href="https://www.yuque.com/wnow20/aikit/about-us" target="_blank" rel="noreferrer">
+          <a
+            href="https://goworks.vercel.app/aikit/about-aikit.html"
+            target="_blank"
+            rel="noreferrer"
+          >
             关于
           </a>
         </div>
