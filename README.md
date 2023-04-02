@@ -63,6 +63,7 @@ Edge如下：
   - 多语言
 - issues
   - [ ] aikit 去除 twindcss class styles
+  - [ ] 去除api key，改放在后端
 - Chores
   - [ ] 编辑yuque文档
   - [ ] 分发：知乎帖子
