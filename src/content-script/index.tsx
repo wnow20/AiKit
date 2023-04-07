@@ -1,5 +1,4 @@
 import { render } from 'preact'
-import '../base.css'
 import FloatingKit from '../components/FloatingKit'
 import { getUserConfig, Language, Theme } from '../config'
 import { detectSystemColorScheme } from '../utils'
@@ -116,7 +115,7 @@ async function run() {
       const searchValueWithLanguageOption =
         userConfig.language === Language.Auto
           ? searchInput.value
-          : `${searchInput.value}(in ${userConfig.language})`
+          : `(please answer in ${userConfig.language})${searchInput.value}`
       mount(searchValueWithLanguageOption, siteConfig)
     }
   }
