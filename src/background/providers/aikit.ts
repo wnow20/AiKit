@@ -3,8 +3,10 @@ import { GenerateAnswerParams, Provider } from '../types'
 import { ASSISTANT_GREETING, extractMessages } from './provider-common'
 import { ChatCompletionParams, ChatCompletionResponse } from './provider-types'
 
-const API_HOST =
-  'http://nginx.web-framework-p8cg.1109595215468882.cn-hongkong.fc.devsapp.net/openai'
+const API_HOST = 'https://aikit.goworks.net/proxy/openai'
+
+// const API_HOST =
+//   'http://nginx.web-framework-p8cg.1109595215468882.cn-hongkong.fc.devsapp.net/openai'
 
 // const API_HOST =
 //   'http://openai-proxy.openai-proxy.1109595215468882.cn-hongkong.fc.devsapp.net'
